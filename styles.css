@@ -5,6 +5,7 @@
     --triple-letter: #606e7b;
     --double-word: #e8a692;
     --triple-word: #a43236;
+    --letter-tile: #f9f4ed;
 }
 
 html {
@@ -26,6 +27,10 @@ html {
     border: 1px solid var(--grey);
     background-color: var(--beige);
     box-sizing: border-box;
+}
+.letter-tile {
+    background-color: var(--letter-tile);
+    border-radius: 10px;
 }
 .double-letter, .triple-letter, .double-word, .triple-word {
     color: white;

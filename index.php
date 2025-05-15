@@ -29,7 +29,11 @@ $initial_board = readBoard();
      <?php
      foreach ($initial_board as $tile_index => $tile) {
          $tile_letter = $tile[1];
-         $tile_class = $tile_types[$tile[0]];
+         if($tile_letter != ""){
+             $tile_class = "letter-tile";
+         } else {
+             $tile_class = $tile_types[$tile[0]];
+         }
          echo "<div id='tile-".$tile_index."' class='scrabble-tile ".$tile_class."'>".$tile_letter."</div>";
      }
      ?>
