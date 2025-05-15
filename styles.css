@@ -1,0 +1,37 @@
+:root {
+    --grey: #555555;
+    --beige: #f1e7d4;
+    --double-letter: #aabcbe;
+    --triple-letter: #606e7b;
+    --double-word: #e8a692;
+    --triple-word: #a43236;
+}
+
+.scrabble-board {
+    width: 750px;
+    background-color: black;
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    font-size: 40px;
+    
+}
+.scrabble-tile {
+    width: 50px;
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--grey);
+    background-color: var(--beige);
+    box-sizing: border-box;
+}
+.double-letter {
+    background-color: var(--double-letter);
+}
+.triple-letter {
+    background-color: var(--triple-letter);
+}
+.double-word {
+    background-color: var(--double-word);
+}
+.triple-word {
+    background-color: var(--triple-word);
+}
