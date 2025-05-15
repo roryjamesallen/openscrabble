@@ -42,18 +42,24 @@ $initial_hand = ["A", "B", "C", "D", "E", "F", "G"];
     <body>
      <div class="main-container">
      <div class="scrabble-board">
-     <?php
+<?php
      renderBoard($initial_board);
-     ?>
+?>
      </div>
 
      <div class="hand">
-     <?php
+<?php
      foreach ($initial_hand as $tile_index => $tile_letter) {
-         echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile'>".$tile_letter."</div>";
+         echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile' onclick='setHolding(this)'>".$tile_letter."</div>";
      }
-     ?>
+?>
      </div>
      </div>
+
+    <script>
+    function setHolding(tile_id) {
+        tile_index = tile_id.split('-')
+    }
+    </script>
     </body>
 </html>
