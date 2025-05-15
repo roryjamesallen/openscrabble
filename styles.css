@@ -12,14 +12,18 @@ html {
     font-family: Helvetica;
 }
 
-.scrabble-board {
-    width: 750px;
+.scrabble-board, .hand {
     background-color: black;
     display: flex;
     flex-wrap: wrap;
     text-align: center;
     font-size: 40px;
-    
+}
+.scrabble-board {
+    width: 750px;
+}
+.hand {
+    width: 105px;
 }
 .scrabble-tile {
     width: 50px;

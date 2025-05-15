@@ -17,6 +17,8 @@ $tile_types = [
 
 $initial_board = readBoard();
 
+$initial_hand = ["A", "B", "C", "D", "E", "F", "G"];
+
 ?>
 
 <html>
@@ -35,6 +37,14 @@ $initial_board = readBoard();
              $tile_class = $tile_types[$tile[0]];
          }
          echo "<div id='tile-".$tile_index."' class='scrabble-tile ".$tile_class."'>".$tile_letter."</div>";
+     }
+     ?>
+     </div>
+
+     <div class="hand">
+     <?
+     foreach ($initial_hand as $tile_index => $tile_letter) {
+         echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile>".$tile_letter."</div>";
      }
      ?>
      </div>
