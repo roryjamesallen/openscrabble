@@ -30,7 +30,7 @@ html {
 }
 .letter-tile {
     background-color: var(--letter-tile);
-    border-radius: 10px;
+    border-radius: 5px;
 }
 .double-letter, .triple-letter, .double-word, .triple-word {
     color: white;
