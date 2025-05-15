@@ -7,6 +7,10 @@
     --triple-word: #a43236;
 }
 
+html {
+    font-family: Helvetica;
+}
+
 .scrabble-board {
     width: 750px;
     background-color: black;
@@ -22,6 +26,9 @@
     border: 1px solid var(--grey);
     background-color: var(--beige);
     box-sizing: border-box;
+}
+.double-letter, .triple-letter, .double-word, .triple-word {
+    color: white;
 }
 .double-letter {
     background-color: var(--double-letter);
