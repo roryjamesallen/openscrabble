@@ -1,4 +1,12 @@
 <?php
+$tile_types = [
+    "",
+    "double-letter",
+    "triple-letter",
+    "double-word",
+    "triple-word"
+];
+
 function saveBoard($board) {
     file_put_contents('game.txt', json_encode($board));
 }
@@ -7,13 +15,18 @@ function readBoard() {
     return json_decode(file_get_contents('game.txt'), true);
 }
 
-$tile_types = [
-    "",
-    "double-letter",
-    "triple-letter",
-    "double-word",
-    "triple-word"
-];
+function renderBoard($board) {
+    global $tile_types;
+    foreach ($board as $tile_index => $tile) {
+        $tile_letter = $tile[1];
+        if($tile_letter != ""){
+            $tile_class = "letter-tile";
+        } else {
+            $tile_class = $tile_types[$tile[0]];
+        }
+        echo "<div id='tile-".$tile_index."' class='scrabble-tile ".$tile_class."'>".$tile_letter."</div>";
+    }
+}
 
 $initial_board = readBoard();
 
@@ -27,26 +40,20 @@ $initial_hand = ["A", "B", "C", "D", "E", "F", "G"];
     </head>
 
     <body>
+     <div class="main-container">
      <div class="scrabble-board">
      <?php
-     foreach ($initial_board as $tile_index => $tile) {
-         $tile_letter = $tile[1];
-         if($tile_letter != ""){
-             $tile_class = "letter-tile";
-         } else {
-             $tile_class = $tile_types[$tile[0]];
-         }
-         echo "<div id='tile-".$tile_index."' class='scrabble-tile ".$tile_class."'>".$tile_letter."</div>";
-     }
+     renderBoard($initial_board);
      ?>
      </div>
 
      <div class="hand">
-     <?
+     <?php
      foreach ($initial_hand as $tile_index => $tile_letter) {
-         echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile>".$tile_letter."</div>";
+         echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile'>".$tile_letter."</div>";
      }
      ?>
+     </div>
      </div>
     </body>
 </html>

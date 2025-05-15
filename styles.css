@@ -12,22 +12,31 @@ html {
     font-family: Helvetica;
 }
 
+body {
+    margin: 50px;
+}
+
+.main-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px;
+}
 .scrabble-board, .hand {
     background-color: black;
     display: flex;
-    flex-wrap: wrap;
     text-align: center;
     font-size: 40px;
 }
 .scrabble-board {
     width: 750px;
+    flex-wrap: wrap;
 }
 .hand {
-    width: 105px;
+    align-self: flex-start;
 }
 .scrabble-tile {
     width: 50px;
-    aspect-ratio: 1 / 1;
+    height: 50px;
     border: 1px solid var(--grey);
     background-color: var(--beige);
     box-sizing: border-box;
