@@ -24,7 +24,7 @@ function renderBoard($board) {
         } else {
             $tile_class = $tile_types[$tile[0]];
         }
-        echo "<div id='board-tile-".$tile_index."' class='scrabble-tile '".$tileclass." onclick='attemptTileMove(this)'><input name='".$tile_index."' value='".$tile_letter."'/></div>";
+        echo "<input name='".$tile_index."' value='".$tile_letter."' class='scrabble-tile ".$tile_class."' onclick='attemptTileMove(this)'/>";
     }
 }
 
@@ -59,11 +59,11 @@ $initial_hand = readArrayFile('user_hand_1.txt');
 
          <div id="hand" class="hand">
          <?php foreach ($initial_hand as $tile_index => $tile_letter) {
-             echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile' onclick='setHolding(this)'><input name='".$tile_index."' value='".$tile_letter."'</input></div>";
+             echo "<input name='".$tile_index."' value='".$tile_letter."' class='scrabble-tile letter-tile' onclick='setHolding(this)'/>";
          } ?>
          </div>
 	 
-         <div id='holding-tile' class='scrabble-tile letter-tile'></div>
+         <input id='holding-tile' value="" class='scrabble-tile letter-tile'></div>
 	     <div id='recall-button' class='scrabble-tile letter-tile button' onclick="recallHand()">Recall</div>
      
          <input type="submit" value="" id="go-button" name="go-button"></input>
@@ -71,16 +71,14 @@ $initial_hand = readArrayFile('user_hand_1.txt');
 	</form> 
     </div>
 
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
     <script>
-	tilebag = <?php echo json_encode($tilebag); ?>; /* Get the tilebag contents at the start */
-	
     function setHolding(tile) {
-		tile_letter = tile.innerHTML;
+		tile_letter = tile.value;
 		holding_tile = document.getElementById('holding-tile')
-		if (tile_letter != "" && holding_tile.innerHTML == "") {
-			holding_tile.innerHTML = tile_letter;
-			tile.innerHTML = "";
+		if (tile_letter != "" && holding_tile.value == "") {
+			holding_tile.value = tile_letter;
+			tile.value = "";
 		} else {
 			attemptTileMove(tile); /* Put the held tile back in your hand */
 		}
@@ -88,12 +86,12 @@ $initial_hand = readArrayFile('user_hand_1.txt');
 	
 	function attemptTileMove(slot) {
 		tile_in_hand = document.getElementById('holding-tile');
-		tile_in_hand_letter = tile_in_hand.innerHTML;
-		if (tile_in_hand_letter != "" && slot.innerHTML == "") { /* If there is a tile in your hand and the slot is free */
-			slot.innerHTML = tile_in_hand_letter; /* Set the slot to the tile's letter */
+		tile_in_hand_letter = tile_in_hand.value;
+		if (tile_in_hand_letter != "" && slot.value == "") { /* If there is a tile in your hand and the slot is free */
+			slot.value = tile_in_hand_letter; /* Set the slot to the tile's letter */
 			slot.classList.add("letter-tile");
 			slot.classList.add("recallable");
-			tile_in_hand.innerHTML = ""; /* Remove the tile from your hand */
+			tile_in_hand.value = ""; /* Remove the tile from your hand */
 		}
 	}
 	
@@ -102,10 +100,10 @@ $initial_hand = readArrayFile('user_hand_1.txt');
 		hand = document.getElementById("hand");
 			for (const tile of board.children) {
 				if (tile.classList.contains("recallable")) {
-					for (const slot of hand.children) {
-						if (slot.innerHTML == "") {
-							slot.innerHTML = tile.innerHTML;
-							tile.innerHTML = "";
+					for (const slot of hand.children) { /* Find the next empty hand slot */
+						if (slot.value == "") {
+							slot.value = tile.value;
+							tile.value = "";
 							tile.classList.remove("letter-tile");
 							tile.classList.remove("recallable");
 						}
