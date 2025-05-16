@@ -29,10 +29,10 @@ function renderBoard($board) {
 }
 
 /* If php posted to itself then update file values before anything else */
-if (!empty($_POST["board_array"])) {
-	$new_board_array = $_POST['board_array'];
-	$new_tilebag = $_POST['tilebag'];
-	$new_hand = $_POST['final_hand'];
+if (!empty($_POST)) {
+	$new_board_array = $_POST['new_board_array'];
+	$new_tilebag = $_POST['new_tilebag'];
+	$new_hand = $_POST['new_hand'];
 	saveArrayFile('game.txt', $new_board_array);
 	saveArrayFile('tilebag.txt', $new_tilebag);
 	saveArrayFile('user_hand_1.txt', $new_hand);
@@ -145,7 +145,6 @@ $initial_hand = readArrayFile('user_hand_1.txt');
 	function makeTurn() {
 		board_array = generateBoardArray();
 		hand = document.getElementById("hand");
-		
 		final_hand = [];
 		for (const tile of hand.children) {
 			if (tile.innerHTML == "") { /* Tile that needs replacing */
@@ -161,13 +160,7 @@ $initial_hand = readArrayFile('user_hand_1.txt');
 			}
 		}
 		
-		$.ajax({
-			data: {board_array: board_array, tilebag: tilebag, final_hand: final_hand},
-			method: 'POST',
-			success: function(msg) {
-				window.location.reload();
-			}
-		});
+	    $.post( "index.php", { new_board_array: board_array, new_tilebag: tilebag, new_hand: final_hand } );
 	}
     </script>
     </body>
