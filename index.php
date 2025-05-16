@@ -1,4 +1,14 @@
 <?php
+/* If php posted to itself then update file values before anything else */
+if (!empty($_POST["board_array"])) {
+	$new_board_array = $_POST['board_array'];
+	$new_tilebag = $_POST['tilebag'];
+	$new_hand = $_POST['final_hand'];
+	file_put_contents('game.txt', $new_board_array);
+	file_put_contents('tilebag.txt', $new_tilebag);
+	file_put_contents('user_hand_1.txt', $new_hand);
+}
+
 $tile_types = [
     "",
     "double-letter",
@@ -7,12 +17,12 @@ $tile_types = [
     "triple-word"
 ];
 
-function saveBoard($board) {
-    file_put_contents('game.txt', json_encode($board));
+function saveArrayFile($file, $array) {
+    file_put_contents($file, json_encode($array));
 }
 
-function readBoard() {
-    return json_decode(file_get_contents('game.txt'), true);
+function readArrayFile($filename) {
+    return json_decode(file_get_contents($filename), true);
 }
 
 function renderBoard($board) {
@@ -24,14 +34,13 @@ function renderBoard($board) {
         } else {
             $tile_class = $tile_types[$tile[0]];
         }
-        echo "<div id='tile-".$tile_index."' class='scrabble-tile ".$tile_class."'>".$tile_letter."</div>";
+        echo "<div id='tile-".$tile_index."' class='scrabble-tile ".$tile_class."' onclick='attemptTileMove(this)'>".$tile_letter."</div>";
     }
 }
 
-$initial_board = readBoard();
-
-$initial_hand = ["A", "B", "C", "D", "E", "F", "G"];
-
+$tilebag = readArrayFile('tilebag.txt');
+$initial_board = readArrayFile('game.txt');
+$initial_hand = readArrayFile('user_hand_1.txt');
 ?>
 
 <html>
@@ -40,26 +49,137 @@ $initial_hand = ["A", "B", "C", "D", "E", "F", "G"];
     </head>
 
     <body>
-     <div class="main-container">
-     <div class="scrabble-board">
+	 
+     <div id="main-container" class="main-container">
+     <div id="scrabble-board" class="scrabble-board">
 <?php
      renderBoard($initial_board);
 ?>
      </div>
 
-     <div class="hand">
+     <div id="hand" class="hand">
 <?php
      foreach ($initial_hand as $tile_index => $tile_letter) {
          echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile' onclick='setHolding(this)'>".$tile_letter."</div>";
      }
 ?>
      </div>
+	 
+	 <div id='holding-tile' class='scrabble-tile letter-tile'></div>
+	 <div id='recall-button' class='scrabble-tile letter-tile button' onclick="recallHand()">Recall</div>
+	 <div id='go-button' class='scrabble-tile letter-tile button' onclick="makeTurn()">Make Turn</div>
+	 
      </div>
 
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
-    function setHolding(tile_id) {
-        tile_index = tile_id.split('-')
+	tilebag = <?php echo json_encode($tilebag); ?>; /* Get the tilebag contents at the start */
+	
+    function setHolding(tile) {
+		tile_letter = tile.innerHTML;
+		holding_tile = document.getElementById('holding-tile')
+		if (tile_letter != "" && holding_tile.innerHTML == "") {
+			holding_tile.innerHTML = tile_letter;
+			tile.innerHTML = "";
+		} else {
+			attemptTileMove(tile); /* Put the held tile back in your hand */
+		}
     }
+	
+	function attemptTileMove(slot) {
+		tile_in_hand = document.getElementById('holding-tile');
+		tile_in_hand_letter = tile_in_hand.innerHTML;
+		if (tile_in_hand_letter != "" && slot.innerHTML == "") { /* If there is a tile in your hand and the slot is free */
+			slot.innerHTML = tile_in_hand_letter; /* Set the slot to the tile's letter */
+			slot.classList.add("letter-tile");
+			slot.classList.add("recallable");
+			tile_in_hand.innerHTML = ""; /* Remove the tile from your hand */
+		}
+	}
+	
+	function recallHand() {
+		board = document.getElementById("scrabble-board");
+		hand = document.getElementById("hand");
+			for (const tile of board.children) {
+				if (tile.classList.contains("recallable")) {
+					for (const slot of hand.children) {
+						if (slot.innerHTML == "") {
+							slot.innerHTML = tile.innerHTML;
+							tile.innerHTML = "";
+							tile.classList.remove("letter-tile");
+							tile.classList.remove("recallable");
+						}
+					}
+				}
+			}
+	}
+	
+	function generateBoardArray() {
+		board = document.getElementById("scrabble-board");
+		board_array = "[";
+		for (const tile of board.children) {
+			tile_id = tile.id;
+			tile_index = tile_id.split('-');
+			tile_letter = '"' + tile.innerHTML + '"';
+			tile_classes = tile.classList;
+			if (tile_classes.contains('double-letter')) {
+				tile_class = 1;
+			} else if (tile_classes.contains('triple-letter')) {
+				tile_class = 2;
+			} else if (tile_classes.contains('double-word')) {
+				tile_class = 3;
+			} else if (tile_classes.contains('triple-word')) {
+				tile_class = 4;
+			} else {
+				tile_class = 0;
+			}
+			board_array += "[" + tile_class + "," + tile_letter + "],";
+		}
+		board_array = board_array.substring(0, board_array.length - 1); /* Remove last comma */
+		board_array += "]";
+		return board_array;
+	}
+	
+	function removeLastChar(string) {
+		return string.substring(0, string.length - 1); /* Remove last comma */
+	}
+	
+	function makeTurn() {
+		board_array = generateBoardArray();
+		hand = document.getElementById("hand");
+		
+		final_hand = "[";
+		for (const tile of hand.children) {
+			if (tile.innerHTML == "") { /* Tile that needs replacing */
+				if (tilebag.length != 0) {
+					replacement_tile = tilebag[Math.floor(Math.random() * tilebag.length)];; /* Pick a random tile from the bag */
+					final_hand += '"' + replacement_tile + '",'; /* Put the tile in the user's hand */
+					bag_tile = tilebag.indexOf(replacement_tile); /* Find one (first) instance of tile in bag */
+					tilebag.splice(bag_tile, 1); /* Remove the tile from the bag */
+				}
+			} else {
+				
+				final_hand += '"' + tile.innerHTML + '",';
+			}
+		}
+		final_hand = final_hand.substring(0, final_hand.length - 1); /* Remove last comma */
+		final_hand += "]";
+		
+		tilebag_string = '[';
+		for (var i = 0; i < tilebag.length; i++) {
+			tilebag_string += '"' + tilebag[i] + '",';
+		}
+		tilebag_string = removeLastChar(tilebag_string); /* Remove last comma */
+		tilebag = tilebag_string + ']';
+		
+		$.ajax({
+			data: {board_array: board_array, tilebag: tilebag, final_hand: final_hand},
+			method: 'POST',
+			success: function(msg) {
+				window.location.reload();
+			}
+		});
+	}
     </script>
     </body>
 </html>
