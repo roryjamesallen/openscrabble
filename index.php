@@ -28,24 +28,40 @@ function renderBoard($board) {
     }
 }
 
-/* If php posted to itself then update file values before anything else */
-if (!empty($_POST)) {
-
-    
-    $topleft = $_POST['board-tile-0'];
-    echo '<h1>'.$topleft.'</h1>';
-    
-	$new_board_array = $_POST['new_board_array'];
-	$new_tilebag = $_POST['new_tilebag'];
-	$new_hand = $_POST['new_hand'];
-	saveArrayFile('game.txt', $new_board_array);
-	saveArrayFile('tilebag.txt', $new_tilebag);
-	saveArrayFile('user_hand_1.txt', $new_hand);
-}
-
 $tilebag = readArrayFile('tilebag.txt');
 $initial_board = readArrayFile('game.txt');
 $initial_hand = readArrayFile('user_hand_1.txt');
+
+/* If php posted to itself then update file values before anything else */
+if (!empty($_POST)) {
+
+    /* Add placed tiles to the new baord and save to file */
+    $new_board = [];
+    for ($i = 0; $i < 225; $i++) {
+        $tile_name = "board-tile-{$i}";
+        $tile_letter = $_POST[$tile_name];
+        $tile_class = $initial_board[$i][0];
+        $new_board[] = [$tile_class, $tile_letter];
+    }
+	saveArrayFile('game.txt', $new_board);
+    $initial_board = $new_board;
+
+    /* Replace placed tiles with random new ones in the user's hand */
+    $new_hand = [];
+    for ($i = 0; $i < 7; $i++) {
+        $tile_name = "hand-tile-{$i}";
+        $tile_letter = $_POST[$tile_name];
+        if ($tile_letter == "") {
+            $new_tile = "X";
+            $new_hand[] = $new_tile;
+        } else {
+            $new_hand[] = $initial_hand[$i];
+        }
+    }
+	saveArrayFile('user_1_hand.txt', $new_hand);
+    $initial_hand = $new_hand;
+}
+
 ?>
 
 <html>
