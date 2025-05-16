@@ -24,7 +24,7 @@ function renderBoard($board) {
         } else {
             $tile_class = $tile_types[$tile[0]];
         }
-        echo "<div id='tile-".$tile_index."' class='scrabble-tile ".$tile_class."' onclick='attemptTileMove(this)'>".$tile_letter."</div>";
+        echo "<div id='board-tile-".$tile_index."' class='scrabble-tile '".$tileclass." onclick='attemptTileMove(this)'><input name='".$tile_index."' value='".$tile_letter."'/></div>";
     }
 }
 
@@ -51,25 +51,25 @@ $initial_hand = readArrayFile('user_hand_1.txt');
     <body>
      
      <div id="main-container" class="main-container">
-     <div id="scrabble-board" class="scrabble-board">
-<?php
-     renderBoard($initial_board);
-?>
-     </div>
 
-     <div id="hand" class="hand">
-<?php
-     foreach ($initial_hand as $tile_index => $tile_letter) {
-         echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile' onclick='setHolding(this)'>".$tile_letter."</div>";
-     }
-?>
-     </div>
+     <form action="<?=$_SERVER['PHP_SELF']?>" method="post">
+         <div id="scrabble-board" class="scrabble-board">
+             <?php renderBoard($initial_board); ?>
+         </div>
+
+         <div id="hand" class="hand">
+         <?php foreach ($initial_hand as $tile_index => $tile_letter) {
+             echo "<div id='hand-tile-".$tile_index."' class='scrabble-tile letter-tile' onclick='setHolding(this)'><input name='".$tile_index."' value='".$tile_letter."'</input></div>";
+         } ?>
+         </div>
 	 
-	 <div id='holding-tile' class='scrabble-tile letter-tile'></div>
-	 <div id='recall-button' class='scrabble-tile letter-tile button' onclick="recallHand()">Recall</div>
-	 <div id='go-button' class='scrabble-tile letter-tile button' onclick="makeTurn()">Make Turn</div>
-	 
-     </div>
+         <div id='holding-tile' class='scrabble-tile letter-tile'></div>
+	     <div id='recall-button' class='scrabble-tile letter-tile button' onclick="recallHand()">Recall</div>
+     
+         <input type="submit" value="" id="go-button" name="go-button"></input>
+         <div id='go-button' class='scrabble-tile letter-tile button'>Make Turn</div>
+	</form> 
+    </div>
 
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script>
