@@ -51,9 +51,11 @@ if (!empty($_POST)) {
     for ($i = 0; $i < 7; $i++) {
         $tile_name = "hand-tile-{$i}";
         $tile_letter = $_POST[$tile_name];
-        if ($tile_letter == "") {
-            $new_tile = "X";
-            $new_hand[] = $new_tile;
+        if ($tile_letter == "" && count($tilebag) > 0) {
+            $new_tile = $tilebag[array_rand($tilebag)]; /* Pick a random new letter from the tilebag */
+            unset($tilebag[array_search($new_tile, $tilebag)]); /* Remove the new tile from the tilebag */
+            $new_hand[] = $new_tile; /* Put the new letter in the users hand */
+            
         } else {
             $new_hand[] = $initial_hand[$i];
         }
