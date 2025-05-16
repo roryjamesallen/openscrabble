@@ -72,10 +72,8 @@ if (!empty($_POST)) {
     </head>
 
     <body>
-     
-     <div id="main-container" class="main-container">
-
-     <form action="<?=$_SERVER['PHP_SELF']?>" method="post">
+ 
+     <form action="<?=$_SERVER['PHP_SELF']?>" method="post" class="main-container">
          <div id="scrabble-board" class="scrabble-board">
              <?php renderBoard($initial_board); ?>
          </div>
@@ -91,7 +89,6 @@ if (!empty($_POST)) {
      
          <input type="submit" value="Make Turn" name="go-button" class="scrabble-tile letter-tile button"></input>
 	</form> 
-    </div>
 
     <script>
     function setHolding(tile) {
