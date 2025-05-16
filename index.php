@@ -35,7 +35,7 @@ $initial_hand = readArrayFile('user_hand_1.txt');
 /* If php posted to itself then update file values before anything else */
 if (!empty($_POST)) {
 
-    /* Add placed tiles to the new baord and save to file */
+    /* Add placed tiles to the new board and save to file */
     $new_board = [];
     for ($i = 0; $i < 225; $i++) {
         $tile_name = "board-tile-{$i}";
@@ -93,12 +93,16 @@ if (!empty($_POST)) {
     <script>
     function setHolding(tile) {
 		tile_letter = tile.value;
-		holding_tile = document.getElementById('holding-tile')
-		if (tile_letter != "" && holding_tile.value == "") {
+		holding_tile = document.getElementById('holding-tile');
+        if (tile_letter != "" && holding_tile.value == "") { /* If there's a letter where you clicked and you aren't already holding one */
 			holding_tile.value = tile_letter;
 			tile.value = "";
-		} else {
-			attemptTileMove(tile); /* Put the held tile back in your hand */
+        } else if (tile_letter != "" && tile.name.includes('hand-tile')) { /* If there's a letter where you clicked and it's in your hand */
+            holding_tile_letter = holding_tile.value; /* Get the letter being held */
+            tile.value = holding_tile_letter; /* Set the hand tile to the one being held */
+            holding_tile.value = tile_letter; /* Set the held tile to the one previously in hand */
+        } else {
+			attemptTileMove(tile); /* Put the held tile back in the slot */
 		}
     }
 	
