@@ -67,3 +67,37 @@ body {
 	width: unset;
 	padding: 0 10px;
 }
+
+.red {
+	color: red;
+}
+.outline-red {
+	border-color: red;
+}
+.blue {
+	color: blue;
+}
+.outline-blue {
+	border-color: blue;
+}
+.green {
+	color: green;
+}
+.outline-green {
+	border-color: green;
+}
+.yellow {
+	color: yellow;
+}
+.outline-yellow {
+	border-color: yellow;
+}
+.game-id {
+	color: black;
+	text-decoration: none;
+	background-color: var(--letter-tile);
+	border: 2px solid var(--grey);
+	border-radius: 5px;
+	padding: 10px;
+	margin-right: 5px;
+}

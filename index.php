@@ -25,16 +25,34 @@ function renderBoard($board) {
             $tile_class = $tile_types[$tile[0]];
         }
         echo "<input name='board-tile-".$tile_index."' value='".$tile_letter."' class='scrabble-tile ".$tile_class."' onclick='attemptTileMove(this)'/>";
-    }
+	}
 }
 
-$tilebag = readArrayFile('tilebag.txt');
-$initial_board = readArrayFile('game.txt');
-$initial_hand = readArrayFile('user_hand_1.txt');
+if (!empty($_POST['game_id'])) {
+	$game_id = $_POST['game_id'];
+	$game_path = 'games/'.$game_id.'/';
+	if (isset($_POST['red'])) {
+		$user = 'red';
+	} else if (isset($_POST['blue'])) {
+		$user = 'blue';
+	} else if (isset($_POST['green'])) {
+		$user = 'green';
+	} else if (isset($_POST['yellow'])) {
+		$user = 'yellow';
+	} else if (isset($_POST['user'])) { /* If reloading the page and posting user back to self */
+		$user = $_POST['user'];
+	}
+	echo "<h1><a class='game-id' href='scrabble.php'>Home</a><span class='game-id' onclick=copyGameId(this)>".$game_id."</span> You are <span class='".$user."'>".$user."</span></h1>";
+} else {
+	header('Location: scrabble.php');
+}
+
+$tilebag = readArrayFile($game_path.'tilebag.txt');
+$initial_board = readArrayFile($game_path.'game.txt');
+$initial_hand = readArrayFile($game_path.$user.'.txt');
 
 /* If php posted to itself then update file values before anything else */
-if (!empty($_POST)) {
-
+if (!empty($_POST['user'])) {
     /* Add placed tiles to the new board and save to file */
     $new_board = [];
     for ($i = 0; $i < 225; $i++) {
@@ -43,7 +61,7 @@ if (!empty($_POST)) {
         $tile_class = $initial_board[$i][0];
         $new_board[] = [$tile_class, $tile_letter];
     }
-	saveArrayFile('game.txt', $new_board);
+	saveArrayFile($game_path.'game.txt', $new_board);
     $initial_board = $new_board;
 
     /* Replace placed tiles with random new ones in the user's hand */
@@ -60,7 +78,8 @@ if (!empty($_POST)) {
             $new_hand[] = $initial_hand[$i];
         }
     }
-	saveArrayFile('user_1_hand.txt', $new_hand);
+	saveArrayFile($game_path.'tilebag.txt', $tilebag);
+	saveArrayFile($game_path.$user.'.txt', $new_hand);
     $initial_hand = $new_hand;
 }
 
@@ -74,6 +93,9 @@ if (!empty($_POST)) {
     <body>
  
      <form action="<?=$_SERVER['PHP_SELF']?>" method="post" class="main-container">
+		<input type="hidden" name="game_id" value="<?php echo $game_id ?>"/>
+		<input type="hidden" name="user" value="<?php echo $user ?>"/>
+	 
          <div id="scrabble-board" class="scrabble-board">
              <?php renderBoard($initial_board); ?>
          </div>
@@ -90,7 +112,9 @@ if (!empty($_POST)) {
          <input type="submit" value="Make Turn" name="go-button" class="scrabble-tile letter-tile button"></input>
 	</form> 
 
-    <script>
+    <script>	
+	game_id = "<?php echo $game_id ?>";
+	
     function setHolding(tile) {
 		tile_letter = tile.value;
 		holding_tile = document.getElementById('holding-tile');
@@ -113,6 +137,7 @@ if (!empty($_POST)) {
 			slot.value = tile_in_hand_letter; /* Set the slot to the tile's letter */
 			slot.classList.add("letter-tile");
 			slot.classList.add("recallable");
+			slot.classList.add(user_outline);
 			tile_in_hand.value = ""; /* Remove the tile from your hand */
 		}
 	}
@@ -151,6 +176,10 @@ if (!empty($_POST)) {
 				final_hand.push(tile.innerHTML);
 			}
 		}
+	}
+	
+	function copyGameId() {
+		navigator.clipboard.writeText(game_id);
 	}
     </script>
     </body>
