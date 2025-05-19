@@ -20,8 +20,7 @@
 
       .main-container {
 	  margin: auto;
-	  width: 0;
-	  left: -50vw;
+	  width: 750px;
       }
       
       .loading {
@@ -123,6 +122,15 @@
   </body>
 
   <script>
+    user = "blue";
+
+    user_hands = [
+	"red",
+	"blue",
+	"green",
+	"yellow"
+	]
+    
     multiplier_classes = [
 	'plain',
 	'double-letter',
@@ -148,6 +156,8 @@
 	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
 	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4
     ]
+
+    user_hand_index = user_hands.indexOf(user);
 
     function loadingScreen() {
 	loading = document.createElement("div");
@@ -206,13 +216,13 @@
     
     (function poll(){
 	$.ajax({
-	    url: "check_board.php",
+	    url: "retrieve_data.php",
 	    success: function(data){
 		letters = data[0];
 		renderBoard(letters);
 
-		red_hand = data[1];
-		renderHand(red_hand);
+		user_hand = data[user_hand_index + 1]; /* 0 is the board array so add 1 */
+		renderHand(user_hand);
 	    },
 	    dataType: "json",
 	    complete: poll,
