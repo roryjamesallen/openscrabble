@@ -10,6 +10,7 @@
      }
 ?>
   </head>
+      
   <body onload="loadingScreen()">
     <style>
       :root {
@@ -129,25 +130,17 @@
     
   </body>
 
-  <script>
-    user = "<?php echo $user ?>";
 
-    user_hands = [
-	"red",
-	"blue",
-	"green",
-	"yellow"
-	]
+  <script>
+multiplier_classes = [
+        'plain',
+        'double-letter',
+        'triple-letter',
+        'double-word',
+        'triple-word'
+]
     
-    multiplier_classes = [
-	'plain',
-	'double-letter',
-	'triple-letter',
-	'double-word',
-	'triple-word'
-    ]
-    
-    multipliers = [
+multipliers = [
 	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4,
 	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
 	0,0,3,0,0,0,1,0,1,0,0,0,3,0,0,
@@ -163,19 +156,30 @@
 	0,0,3,0,0,0,1,0,1,0,0,0,3,0,0,
 	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
 	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4
-    ]
+]
 
-    user_hand_index = user_hands.indexOf(user);
+user_hands = [
+	"red",
+	"blue",
+	"green",
+	"yellow"
+]
+user = "<?php echo $user ?>";
+user_hand_index = user_hands.indexOf(user);
 
-    function loadingScreen() {
+
+picked_up = "";
+
+
+function loadingScreen() {
 	loading = document.createElement("div");
 	loading.classList.add('loading');
 	loading.innerHTML = "Loading Game...";
 	board = document.getElementById("board");
 	board.appendChild(loading);
-    }
+}
 
-    function loadFile(file) {
+function loadFile(file) {
 	var result = null;
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("GET", file, false);
@@ -184,62 +188,101 @@
 	    result = xmlhttp.responseText;
 	}
 	return result;
-    }
+}
 
-    function renderHand(hand_letters) {
+function addLetterToTile(tile, letter) {
+    tile.innerHTML = letter;
+    tile.classList.add('letter');
+    if (letter != "") {
+        tile.classList.add(letter.toLowerCase());
+    }
+}
+
+function clickedTile(tile) {
+    if (tile.classList.contains('letter')) {
+        if (tile.parentNode.id == 'hand') {
+             if (picked_up != "") {
+                 /* SWAP TILE WITH PICKED UP TILE */
+                 
+             } else {
+                 /* PICK UP TILE FROM HAND */
+                 picked_up = tile;
+                 return;
+             }
+        } else {
+            if (tile.classList.contains('recallable')) {
+                /* RECALL TILE TO HAND */
+            } else {
+                /* NOT A RECALLABLE TILE */
+                return;
+            }
+        }
+    } else {
+        if (picked_up != "") {
+            /* PUT DOWN PICKED UP TILE */
+            addLetterToTile(tile, picked_up.innerHTML);
+            tile.classList.add('recallable');
+            picked_up = "";
+            return;
+        } else {
+            /* TILE IS EMPTY SLOT AND NOTHING PICKED UP TO PLACE */
+            return;
+        }
+    }
+    
+}
+
+function createTile(letter) {
+    tile = document.createElement("div"); /* Create a tile div */
+    tile.classList.add("tile"); /* Sizing etc */
+    if (letter != "") {
+        tile.innerHTML = letter; /* Set the letter */
+        addLetterToTile(tile, letter);
+    }
+    tile.addEventListener("click", function(){ clickedTile(this) });
+    return tile;
+}
+
+function renderHand(hand_letters) {
 	hand = document.getElementById("hand");
 	hand.innerHTML = ""; /* Clear the current board state */
 	hand_letters.forEach(function (letter, index) {
-	    tile = document.createElement("div"); /* Create a tile div */
-	    tile.innerHTML = letter; /* Set the letter */
-	    tile.classList.add("tile"); /* Sizing etc */
-	    tile.classList.add('letter'); /* Background colour */
-	    tile.classList.add(letter.toLowerCase()); /* Add tile */
+        tile = createTile(letter);
 	    hand.appendChild(tile); /* Add the tile to the board */
 	})
-    }
+}
     
-    function renderBoard(letters) {
-	board = document.getElementById("board");
-	board.innerHTML = ""; /* Clear the current board state */
-	letters.forEach(function (letter, index) {
-	    tile = document.createElement("div"); /* Create a tile div */
-	    tile.innerHTML = letter; /* Set the letter */
-	    multiplier = multipliers[index]; /* Work out multipler */
-	    multiplier_class = multiplier_classes[multiplier];
-	    tile.classList.add("tile"); /* Sizing etc */
+function renderBoard(letters) {
+    board = document.getElementById("board");
+    board.innerHTML = ""; /* Clear the current board state */
+    letters.forEach(function (letter, index) {
+        tile = createTile(letter);
 	    
-	    if (letter != "") {
-		tile.classList.add('letter'); /* Background colour */
-		tile.classList.add(letter.toLowerCase()); /* Add tile score */
-	    } else {
-		tile.classList.add(multiplier_class); /* Background colour */
-	    }
-	    board.appendChild(tile); /* Add the tile to the board */
-	})
-
-	hand = loadFile('red_hand.txt');
-	
-    }
+        multiplier_class = multiplier_classes[multipliers[index]];
+        tile.classList.add(multiplier_class); /* Background colour */
+        
+        board.appendChild(tile); /* Add the tile to the board */
+    })
+        }
     
-    (function poll(){
+(function poll(){
 	$.ajax({
-	    url: "retrieve_data.php",
-	    success: function(data){
-		letters = data[0];
-		renderBoard(letters);
+            url: "retrieve_data.php",
+                success: function(data){
+                    letters = data[0];
+                    renderBoard(letters);
 
-		user_hand = data[user_hand_index + 1]; /* 0 is the board array so add 1 */
-		renderHand(user_hand);
-	    },
-	    dataType: "json",
-	    complete: poll,
-	    timeout: 30000 });
-    })();
+                    user_hand = data[user_hand_index + 1]; /* 0 is the board array so add 1 */
+                    renderHand(user_hand);
+                },
+                dataType: "json",
+                complete: poll,
+                timeout: 30000 });
+})();
     
-    function pickRandom(array) {
+function pickRandom(array) {
 	return array[Math.floor(Math.random() * array.length)];
-    }
+}
     
   </script>
 </html>
