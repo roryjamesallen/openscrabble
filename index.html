@@ -1,0 +1,164 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  </head>
+  <body onload="initialiseBoard()">
+    <style>
+      :root {
+	  --grey: #555555;
+	  --beige: #f1e7d4;
+	  --double-letter: #aabcbe;
+	  --triple-letter: #606e7b;
+	  --double-word: #e8a692;
+	  --triple-word: #a43236;
+	  --letter-tile: #f9f4ed;
+      }
+      
+      body {
+	  font-family: Helvetica;
+      }
+
+      .board {
+	  display: flex;
+	  flex-wrap: wrap;
+	  width: 750px;
+      }
+      
+      .tile {
+	  width: 50px;
+	  height: 50px;
+	  line-height: 50px;
+	  text-align: center;
+	  font-size: 35px;
+	  background-color: var(--beige);
+	  border: 2px solid white;
+	  border-radius: 5px;
+	  box-sizing: border-box;
+	  position: relative;
+      }
+      .tile::after {
+	  display: block;
+	  position: absolute;
+	  bottom: -15px;;
+	  right: 2px;
+	  font-size: 15px;
+      }
+
+      .letter {
+	  background-color: var(--letter-tile);
+	  border-color: var(--grey);
+      }
+      
+      .e::after, .a::after, .i::after, .o::after, .n::after, .r::after, .t::after, .l::after, .s::after, .u::after {
+	  content: "1";
+      }
+      .d::after, .g::after {
+	  content: "2";
+      }
+      .b::after, .c::after, .m::after, .p::after {
+	  content: "3";
+      }
+      .f::after, .h::after, .v::after, .w::after, .y::after {
+	  content: "4";
+      }
+      .k::after {
+	  content: "5";
+      }
+      .j::after, .x::after {
+	  content: "8";
+      }
+      .q::after, .z::after {
+	  content: "10";
+      }
+
+      .double-letter {
+	  background-color: var(--double-letter);
+      }
+      .triple-letter {
+	  background-color: var(--triple-letter);
+      }
+      .double-word {
+	  background-color: var(--double-word);
+      }
+      .triple-word {
+	  background-color: var(--triple-word);
+      }
+    </style>
+
+    <h1 id="heading"></h1>
+    <div id="board" class="board">
+    </div>
+    
+  </body>
+
+  <script>
+    multiplier_classes = [
+	'plain',
+	'double-letter',
+	'triple-letter',
+	'double-word',
+	'triple-word'
+    ]
+    
+    multipliers = [
+	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4,
+	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
+	0,0,3,0,0,0,1,0,1,0,0,0,3,0,0,
+	1,0,0,3,0,0,0,1,0,0,0,3,0,0,1,
+	0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,
+	0,2,0,0,0,2,0,0,0,2,0,0,0,2,0,
+	0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,
+	4,0,0,1,0,0,0,3,0,0,0,1,0,0,4,
+	0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,
+	0,2,0,0,0,2,0,0,0,2,0,0,0,2,0,
+	0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,
+	1,0,0,3,0,0,0,1,0,0,0,3,0,0,1,
+	0,0,3,0,0,0,1,0,1,0,0,0,3,0,0,
+	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
+	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4
+    ]
+
+    empty_board = ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""]
+
+    function initialiseBoard() {
+	renderBoard(empty_board);
+    }
+    
+    function renderBoard(letters) {
+	board = document.getElementById("board");
+	board.innerHTML = ""; /* Clear the current board state */
+	letters.forEach(function (letter, index) {
+	    tile = document.createElement("div"); /* Create a tile div */
+	    tile.innerHTML = letter; /* Set the letter */
+	    multiplier = multipliers[index]; /* Work out multipler */
+	    multiplier_class = multiplier_classes[multiplier];
+	   
+	    tile.classList.add("tile");
+	    tile.classList.add(multiplier_class);
+	    if (letter != "") {
+		tile.classList.add('letter');
+		tile.classList.add(letter.toLowerCase()); /* Add tile score */
+	    }
+	    board.appendChild(tile); /* Add the tile to the board */
+	})
+    }
+    
+    (function poll(){
+	$.ajax({
+	    url: "check_board.php",
+	    success: function(data){
+		letters = data;
+		renderBoard(letters);
+	    },
+	    dataType: "json",
+	    complete: poll,
+	    timeout: 30000 });
+    })();
+    
+    function pickRandom(array) {
+	return array[Math.floor(Math.random() * array.length)];
+    }
+    
+    
+  </script>
+</html>
