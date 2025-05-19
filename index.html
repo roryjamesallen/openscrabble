@@ -2,7 +2,7 @@
   <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   </head>
-  <body onload="initialiseBoard()">
+  <body>
     <style>
       :root {
 	  --grey: #555555;
@@ -22,6 +22,16 @@
 	  display: flex;
 	  flex-wrap: wrap;
 	  width: 750px;
+      }
+
+      .hand {
+	  display: flex;
+	  justify-content: space-evenly;
+	  width: 750px;
+	  border: 5px solid #005500;
+	  box-sizing: border-box;
+	  background-color: green;
+	  border-top-color: green;
       }
       
       .tile {
@@ -86,7 +96,15 @@
     </style>
 
     <h1 id="heading"></h1>
-    <div id="board" class="board">
+    <div id="board" class="board"></div>
+    <div id="hand" class="hand">
+      <div class="tile letter a">A</div>
+      <div class="tile letter a">A</div>
+      <div class="tile letter a">A</div>
+      <div class="tile letter a">A</div>
+      <div class="tile letter a">A</div>
+      <div class="tile letter a">A</div>
+      <div class="tile letter a">A</div>
     </div>
     
   </body>
@@ -117,12 +135,6 @@
 	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
 	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4
     ]
-
-    empty_board = ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""]
-
-    function initialiseBoard() {
-	renderBoard(empty_board);
-    }
     
     function renderBoard(letters) {
 	board = document.getElementById("board");
@@ -133,11 +145,13 @@
 	    multiplier = multipliers[index]; /* Work out multipler */
 	    multiplier_class = multiplier_classes[multiplier];
 	   
-	    tile.classList.add("tile");
-	    tile.classList.add(multiplier_class);
+	    tile.classList.add("tile"); /* Sizing etc */
+	    
 	    if (letter != "") {
-		tile.classList.add('letter');
+		tile.classList.add('letter'); /* Background colour */
 		tile.classList.add(letter.toLowerCase()); /* Add tile score */
+	    } else {
+		tile.classList.add(multiplier_class); /* Background colour */
 	    }
 	    board.appendChild(tile); /* Add the tile to the board */
 	})
@@ -158,7 +172,6 @@
     function pickRandom(array) {
 	return array[Math.floor(Math.random() * array.length)];
     }
-    
     
   </script>
 </html>
