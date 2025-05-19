@@ -2,7 +2,7 @@
   <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   </head>
-  <body>
+  <body onload="loadingScreen()">
     <style>
       :root {
 	  --grey: #555555;
@@ -16,6 +16,25 @@
       
       body {
 	  font-family: Helvetica;
+      }
+
+      .main-container {
+	  margin: auto;
+	  width: 0;
+	  left: -50vw;
+      }
+      
+      .loading {
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	  width: 100vw;
+	  height: 100vh;
+	  padding-top: calc(50vh - 50px);
+	  text-align: center;
+	  font-size: 100px;
+	  background-color: white;
+	  z-index: 999;
       }
 
       .board {
@@ -32,6 +51,7 @@
 	  box-sizing: border-box;
 	  background-color: green;
 	  border-top-color: green;
+	  margin-top: 50px;
       }
       
       .tile {
@@ -95,16 +115,9 @@
       }
     </style>
 
-    <h1 id="heading"></h1>
-    <div id="board" class="board"></div>
-    <div id="hand" class="hand">
-      <div class="tile letter a">A</div>
-      <div class="tile letter a">A</div>
-      <div class="tile letter a">A</div>
-      <div class="tile letter a">A</div>
-      <div class="tile letter a">A</div>
-      <div class="tile letter a">A</div>
-      <div class="tile letter a">A</div>
+    <div class="main-container">
+      <div id="board" class="board"></div>
+      <div id="hand" class="hand"></div>
     </div>
     
   </body>
@@ -135,6 +148,38 @@
 	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
 	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4
     ]
+
+    function loadingScreen() {
+	loading = document.createElement("div");
+	loading.classList.add('loading');
+	loading.innerHTML = "Loading Game...";
+	board = document.getElementById("board");
+	board.appendChild(loading);
+    }
+
+    function loadFile(file) {
+	var result = null;
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("GET", file, false);
+	xmlhttp.send();
+	if (xmlhttp.status==200) {
+	    result = xmlhttp.responseText;
+	}
+	return result;
+    }
+
+    function renderHand(hand_letters) {
+	hand = document.getElementById("hand");
+	hand.innerHTML = ""; /* Clear the current board state */
+	hand_letters.forEach(function (letter, index) {
+	    tile = document.createElement("div"); /* Create a tile div */
+	    tile.innerHTML = letter; /* Set the letter */
+	    tile.classList.add("tile"); /* Sizing etc */
+	    tile.classList.add('letter'); /* Background colour */
+	    tile.classList.add(letter.toLowerCase()); /* Add tile */
+	    hand.appendChild(tile); /* Add the tile to the board */
+	})
+    }
     
     function renderBoard(letters) {
 	board = document.getElementById("board");
@@ -144,7 +189,6 @@
 	    tile.innerHTML = letter; /* Set the letter */
 	    multiplier = multipliers[index]; /* Work out multipler */
 	    multiplier_class = multiplier_classes[multiplier];
-	   
 	    tile.classList.add("tile"); /* Sizing etc */
 	    
 	    if (letter != "") {
@@ -155,14 +199,20 @@
 	    }
 	    board.appendChild(tile); /* Add the tile to the board */
 	})
+
+	hand = loadFile('red_hand.txt');
+	
     }
     
     (function poll(){
 	$.ajax({
 	    url: "check_board.php",
 	    success: function(data){
-		letters = data;
+		letters = data[0];
 		renderBoard(letters);
+
+		red_hand = data[1];
+		renderHand(red_hand);
 	    },
 	    dataType: "json",
 	    complete: poll,
