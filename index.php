@@ -1,6 +1,14 @@
 <html>
   <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<?php
+     if (!empty($_POST['user'])) {
+         $user = strtolower($_POST['user']);
+     } else {
+         header('Location: scrabble.php');
+     }
+?>
   </head>
   <body onload="loadingScreen()">
     <style>
@@ -122,7 +130,7 @@
   </body>
 
   <script>
-    user = "blue";
+    user = "<?php echo $user ?>";
 
     user_hands = [
 	"red",
