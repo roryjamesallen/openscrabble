@@ -217,7 +217,7 @@ function poll() {
 }
 
 function removeFirstInstance(original_array, item) {
-    
+    original_array.splice(original_array.indexOf(item),1);
 }
 
 function clickedTile(tile) {
@@ -241,7 +241,7 @@ function clickedTile(tile) {
                     /* RECALL TILE TO HAND, tile=tile on board to recall */
                     board_letters[tile_id] = ""; /* Remove letter from board */
                     hand_letters.push(tile_letter); /* Add letter to hand */
-                    recallable.splice(recallable.indexOf(tile_letter),1); /* Make the letter non recallable */
+                    removeFirstInstance(recallable, tile_letter); /* Make the letter non recallable */
                     writeGameData({tile: [tile_id, ""], hand: hand_letters, user: current_user});
                 } else {
                     /* NOT A RECALLABLE TILE */
@@ -251,7 +251,7 @@ function clickedTile(tile) {
             if (picked_up != []) {
                 /* PUT DOWN PICKED UP TILE, tile=slot to put tile down on */
                 hand_tile_letter = document.getElementById(picked_up).innerHTML;
-                hand_letters.splice(hand_letters.indexOf(hand_tile_letter));
+                removeFirstInstance(hand_letters, hand_tile_letter);
                 board_letters[tile_id] = hand_tile_letter;
                 recallable.push(hand_tile_letter);
                 picked_up = "";
