@@ -131,7 +131,7 @@ function renderBoard(letters) {
         tile = createTile(letter, index);
         if ([3,11,36,38,45,52,59,92,96,98,102,108,116,122,126,128,132,165,180,187,194,201,203,228,236].includes(index)){
             tile.classList.add('double-letter');
-        } else if ([].includes(index)) {
+        } else if ([19].includes(index)) {
             tile.classList.add('triple-letter');
         }
         board.appendChild(tile);
