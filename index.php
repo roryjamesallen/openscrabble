@@ -187,6 +187,17 @@ function reloadPage(current_user) {
                 }
     });
 }
+
+function writeGameData(data) {
+    $.ajax({
+        type: "POST",  //type of method
+        url: "write_data.php",  //your page
+        data: data,// passing the values
+        success: function(res){  
+                               
+        }
+    });
+}
     
 function poll() {
     $.ajax({
@@ -194,6 +205,7 @@ function poll() {
             success: function(data) {
                 board_letters = data[0]; /* Array of letters on the board */
                 renderBoard(board_letters);
+                renderHand(hand_letters);
                 new_users_turn = data[1];
                 if (new_users_turn != users_turn) { /* If the user whose turn it is has changed */
                     reloadPage(current_user);
@@ -202,6 +214,10 @@ function poll() {
             dataType: "json",
             complete: poll,
             timeout: 30000 });
+}
+
+function removeFirstInstance(original_array, item) {
+    
 }
 
 function clickedTile(tile) {
@@ -226,6 +242,7 @@ function clickedTile(tile) {
                     board_letters[tile_id] = ""; /* Remove letter from board */
                     hand_letters.push(tile_letter); /* Add letter to hand */
                     recallable.splice(recallable.indexOf(tile_letter),1); /* Make the letter non recallable */
+                    writeGameData({tile: [tile_id, ""], hand: hand_letters, user: current_user});
                 } else {
                     /* NOT A RECALLABLE TILE */
                 }
@@ -238,6 +255,7 @@ function clickedTile(tile) {
                 board_letters[tile_id] = hand_tile_letter;
                 recallable.push(hand_tile_letter);
                 picked_up = "";
+                writeGameData({tile: [tile_id, hand_tile_letter], hand: hand_letters, user: current_user})
             } else {
                 /* TILE IS EMPTY SLOT AND NOTHING PICKED UP TO PLACE */
             }
