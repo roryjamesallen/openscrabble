@@ -1,11 +1,14 @@
 <?php
+$current_user = $_POST['current_user'];
+if ($current_user == "") {
+    header('Location: choose_user.php');
+}
 include 'php_library.php';
 
 $board_letters = readArrayFile('board.txt');
 $tilebag = readArrayFile('tilebag.txt');
-
-$current_user = $_POST['current_user'];
 $users_turn = readArrayFile('users_turn.txt')[0];
+$hand_letters = readArrayFile($current_user.'_hand.txt');
 
 echo "<h1>You are ".$current_user.". It is ".$users_turn."'s turn</h1>";
 ?>
@@ -29,10 +32,26 @@ echo "<h1>You are ".$current_user.". It is ".$users_turn."'s turn</h1>";
 body {
     font-family: Helvetica;
 }
+.main-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px;
+    margin: auto;
+    width: 750px;
+}
 .board {
     display: flex;
     flex-wrap: wrap;
     width: 750px;
+}
+.hand {
+    display: flex;
+    justify-content: space-evenly;
+    width: 600px;
+    border: 5px solid #005500;
+    box-sizing: border-box;
+    background-color: green;
+    border-top-color: green;
 }
 .tile {
     width: 50px;
@@ -93,8 +112,11 @@ body {
     background-color: var(--triple-word);
 }
     </style>
-        <h1 id="heading"></h1>
-        <div id="board" class="board"></div>
+         <h1 id="heading"></h1>
+         <div class="main-container">
+             <div id="board" class="board"></div>
+             <div id="hand" class="hand"></div>
+         </div>
           
 <script>
 function addLetterToTile(tile, letter) {
@@ -120,7 +142,7 @@ function createTile(letter, id) {
         tile.innerHTML = letter; /* Set the letter */
         addLetterToTile(tile, letter);
     }
-    /*tile.addEventListener("click", function(){ clickedTile(this) });*/
+    tile.addEventListener("click", function(){ clickedTile(this) });
     return tile;
 }
      
@@ -138,7 +160,21 @@ function renderBoard(letters) {
         } else if ([0,7,14,105,119,210,217,224].includes(index)) {
             tile.classList.add('triple-word');
         }
+        if (recallable.includes(index)) {
+            tile.classList.add('recallable');
+        }
         board.appendChild(tile);
+    })
+}
+
+function renderHand(letters) {
+    hand = document.getElementById('hand');
+    hand.innerHTML = "";
+    letters.forEach(function (letter, index) {
+        if (letter != "") {
+            tile = createTile(letter, index+225);
+            hand.appendChild(tile);
+        }
     })
 }
      
@@ -168,15 +204,66 @@ function poll() {
             timeout: 30000 });
 }
 
-tilebag = "<?php echo $tilebag ?>";
+function clickedTile(tile) {
+    if (allow_moves == true) { /* Only if it's the current user's turn */
+        hand = document.getElementById('hand');
+        tile_id = tile.id;
+        
+        if (tile.classList.contains('letter')) {
+            tile_letter = tile.innerHTML;
+            if (tile.parentNode.id == 'hand') {
+                if (picked_up != []) {
+                    /* SWAP TILE WITH PICKED UP TILE, tile=tile in hand to swap picked up tile with */
+                 
+                } else {
+                    /* PICK UP TILE FROM HAND, tile=tile in hand to pick up */
+                    picked_up = tile_id;
+                    recallable.push(tile_id);
+                }
+            } else { /* Not in hand */
+                if (recallable.includes(tile_letter)) {
+                    /* RECALL TILE TO HAND, tile=tile on board to recall */
+                    board_letters[tile_id] = ""; /* Remove letter from board */
+                    hand_letters.push(tile_letter); /* Add letter to hand */
+                    recallable.splice(recallable.indexOf(tile_letter),1); /* Make the letter non recallable */
+                } else {
+                    /* NOT A RECALLABLE TILE */
+                }
+            }
+        } else {
+            if (picked_up != []) {
+                /* PUT DOWN PICKED UP TILE, tile=slot to put tile down on */
+                hand_tile_letter = document.getElementById(picked_up).innerHTML;
+                hand_letters.splice(hand_letters.indexOf(hand_tile_letter));
+                board_letters[tile_id] = hand_tile_letter;
+                recallable.push(hand_tile_letter);
+                picked_up = "";
+            } else {
+                /* TILE IS EMPTY SLOT AND NOTHING PICKED UP TO PLACE */
+            }
+        }
+    }
+    renderBoard(board_letters);
+    renderHand(hand_letters);
+}
+
+/* ---- MAIN CODE ---- */
+
+tilebag = <?php echo json_encode($tilebag) ?>;
 current_user = "<?php echo $current_user ?>"; /* String of client's colour */
 users_turn = "<?php echo $users_turn ?>"; /* String of current player's colour */
+board_letters = <?php echo json_encode($board_letters) ?> /* Initial board state */
+hand_letters = <?php echo json_encode($hand_letters) ?> /* Initial user's hand */
+recallable = [];
+picked_up = "";
 
 if (current_user != users_turn) { /* If it's not the current user's turn */
     allow_moves = false;
     poll(); /* Start long polling to show the current player's live tile moves */
 } else {
     allow_moves = true;
+    renderBoard(board_letters);
+    renderHand(hand_letters);
 }
 
 </script>
