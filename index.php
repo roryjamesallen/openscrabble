@@ -9,6 +9,10 @@ $board_letters = readArrayFile('board.txt');
 $tilebag = readArrayFile('tilebag.txt');
 $users_turn = readArrayFile('users_turn.txt')[0];
 $hand_letters = readArrayFile($current_user.'_hand.txt');
+$recallable = readArrayFile('recallable.txt');
+if ($recallable == "") {
+    $recallable = [];
+}
 
 echo "<h1>You are ".$current_user.". It is ".$users_turn."'s turn</h1>";
 ?>
@@ -177,6 +181,11 @@ function renderHand(letters) {
         }
     })
 }
+
+function renderAll() {
+    renderBoard(board_letters);
+    renderHand(hand_letters);
+}
      
 function reloadPage(current_user) {
     $.ajax({
@@ -204,8 +213,7 @@ function poll() {
             url: "retrieve_data.php",
             success: function(data) {
                 board_letters = data[0]; /* Array of letters on the board */
-                renderBoard(board_letters);
-                renderHand(hand_letters);
+                renderAll();
                 new_users_turn = data[1];
                 if (new_users_turn != users_turn) { /* If the user whose turn it is has changed */
                     reloadPage(current_user);
@@ -242,7 +250,7 @@ function clickedTile(tile) {
                     board_letters[tile_id] = ""; /* Remove letter from board */
                     hand_letters.push(tile_letter); /* Add letter to hand */
                     removeFirstInstance(recallable, tile_letter); /* Make the letter non recallable */
-                    writeGameData({tile: [tile_id, ""], hand: hand_letters, user: current_user});
+                    writeGameData({tile: [tile_id, ""], hand: hand_letters, recallable: recallable, user: current_user});
                 } else {
                     /* NOT A RECALLABLE TILE */
                 }
@@ -255,14 +263,13 @@ function clickedTile(tile) {
                 board_letters[tile_id] = hand_tile_letter;
                 recallable.push(hand_tile_letter);
                 picked_up = "";
-                writeGameData({tile: [tile_id, hand_tile_letter], hand: hand_letters, user: current_user})
+                writeGameData({tile: [tile_id, hand_tile_letter], hand: hand_letters, recallable: recallable, user: current_user})
             } else {
                 /* TILE IS EMPTY SLOT AND NOTHING PICKED UP TO PLACE */
             }
         }
     }
-    renderBoard(board_letters);
-    renderHand(hand_letters);
+    renderAll();
 }
 
 /* ---- MAIN CODE ---- */
@@ -270,9 +277,9 @@ function clickedTile(tile) {
 tilebag = <?php echo json_encode($tilebag) ?>;
 current_user = "<?php echo $current_user ?>"; /* String of client's colour */
 users_turn = "<?php echo $users_turn ?>"; /* String of current player's colour */
-board_letters = <?php echo json_encode($board_letters) ?> /* Initial board state */
-hand_letters = <?php echo json_encode($hand_letters) ?> /* Initial user's hand */
-recallable = [];
+board_letters = <?php echo json_encode($board_letters); ?> /* Initial board state */
+hand_letters = <?php echo json_encode($hand_letters); ?> /* Initial user's hand */
+recallable = <?php echo json_encode($recallable); ?> /* Tile placed but not confirmed */
 picked_up = "";
 
 if (current_user != users_turn) { /* If it's not the current user's turn */
