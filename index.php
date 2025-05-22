@@ -129,10 +129,14 @@ function renderBoard(letters) {
     board.innerHTML = "";
     letters.forEach(function (letter, index) {
         tile = createTile(letter, index);
-        if ([3,11,36,38,45,52,59,92,96,98,102,108,116,122,126,128,132,165,180,187,194,201,203,228,236].includes(index)){
+        if ([3,11,36,38,45,52,59,92,96,98,102,108,116,122,126,128,132,165,172,179,186,188,213,221].includes(index)){
             tile.classList.add('double-letter');
-        } else if ([19].includes(index)) {
+        } else if ([20,24,76,80,84,88,136,140,144,148,200,204].includes(index)) {
             tile.classList.add('triple-letter');
+        } else if ([16,28,32,42,48,56,64,112,154,160,168,176,182,192,196,208].includes(index)) {
+            tile.classList.add('double-word');
+        } else if ([0,7,14,105,119,210,217,224].includes(index)) {
+            tile.classList.add('triple-word');
         }
         board.appendChild(tile);
     })
