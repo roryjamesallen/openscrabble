@@ -1,73 +1,39 @@
-<html>
-  <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
 <?php
-     if (!empty($_POST['user'])) {
-         $user = strtolower($_POST['user']);
-     } else {
-         header('Location: scrabble.php');
-     }
+include 'php_library.php';
+
+$board_letters = readArrayFile('board.txt');
+$tilebag = readArrayFile('tilebag.txt');
+
+$current_user = $_POST['current_user'];
+$users_turn = readArrayFile('users_turn.txt')[0];
+
+echo "<h1>You are ".$current_user.". It is ".$users_turn."'s turn</h1>";
 ?>
-  </head>
-      
-  <body onload="loadingScreen()">
+
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    </head>
+    <body>
     <style>
-         :root {
-         --grey: #555555;
-         --beige: #f1e7d4;
-         --double-letter: #aabcbe;
-         --triple-letter: #606e7b;
-         --double-word: #e8a692;
-         --triple-word: #a43236;
-         --letter-tile: #f9f4ed;
-            }
+:root {
+    --grey: #555555;
+    --beige: #f1e7d4;
+    --double-letter: #aabcbe;
+    --triple-letter: #606e7b;
+    --double-word: #e8a692;
+    --triple-word: #a43236;
+    --letter-tile: #f9f4ed;
+ }
       
 body {
     font-family: Helvetica;
 }
-
-.main-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 50px;
-    margin: auto;
-    width: 750px;
-}
-      
-.loading {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    padding-top: calc(50vh - 50px);
-    text-align: center;
-    font-size: 100px;
-    background-color: white;
-    z-index: 999;
-}
-
 .board {
     display: flex;
     flex-wrap: wrap;
     width: 750px;
 }
-
-.hand {
-    display: flex;
-    justify-content: space-evenly;
-    width: 600px;
-    border: 5px solid #005500;
-    box-sizing: border-box;
-    background-color: green;
-    border-top-color: green;
-}
-
-.go-button {
-    flex-grow: 1;
-}
-
 .tile {
     width: 50px;
     height: 50px;
@@ -92,11 +58,6 @@ body {
     background-color: var(--letter-tile) !important;
     border-color: var(--grey) !important;
 }
-
-.recallable {
-    border-color: <?php echo $user ?> !important;
-}
-      
 .e::after, .a::after, .i::after, .o::after, .n::after, .r::after, .t::after, .l::after, .s::after, .u::after {
     content: "1";
 }
@@ -132,79 +93,10 @@ body {
     background-color: var(--triple-word);
 }
     </style>
-
-    <div class="main-container">
-      <div id="board" class="board"></div>
-      <div id="hand" class="hand"></div>
-      <div id="go" class="go-button tile">Go</div>
-    </div>
-    
-  </body>
-
-
-  <script>
-multiplier_classes = [
-        'plain',
-        'double-letter',
-        'triple-letter',
-        'double-word',
-        'triple-word'
-]
-    
-multipliers = [
-	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4,
-	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
-	0,0,3,0,0,0,1,0,1,0,0,0,3,0,0,
-	1,0,0,3,0,0,0,1,0,0,0,3,0,0,1,
-	0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,
-	0,2,0,0,0,2,0,0,0,2,0,0,0,2,0,
-	0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,
-	4,0,0,1,0,0,0,3,0,0,0,1,0,0,4,
-	0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,
-	0,2,0,0,0,2,0,0,0,2,0,0,0,2,0,
-	0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,
-	1,0,0,3,0,0,0,1,0,0,0,3,0,0,1,
-	0,0,3,0,0,0,1,0,1,0,0,0,3,0,0,
-	0,3,0,0,0,2,0,0,0,2,0,0,0,3,0,
-	4,0,0,1,0,0,0,4,0,0,0,1,0,0,4
-]
-
-user_hands = [
-	"red",
-	"blue",
-	"green",
-	"yellow"
-]
-user = "<?php echo $user ?>";
-user_hand_index = user_hands.indexOf(user);
-user_hand = [];
-users_turn = "red";
-
-board_letters = [];
-
-picked_up = "";
-
-
-function loadingScreen() {
-	loading = document.createElement("div");
-    loading.id = "loading";
-	loading.classList.add('loading');
-	loading.innerHTML = "Loading Game...";
-	board = document.getElementById("board");
-	board.appendChild(loading);
-}
-
-function loadFile(file) {
-	var result = null;
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("GET", file, false);
-	xmlhttp.send();
-	if (xmlhttp.status==200) {
-	    result = xmlhttp.responseText;
-	}
-	return result;
-}
-
+        <h1 id="heading"></h1>
+        <div id="board" class="board"></div>
+          
+<script>
 function addLetterToTile(tile, letter) {
     tile.innerHTML = letter;
     tile.classList.add('letter');
@@ -219,70 +111,7 @@ function removeLetterFromTile(tile) {
     tile.classList.remove(letter.toLowerCase());
     tile.classList.remove('recallable');
 }
-
-function saveData(data) {
-    $.ajax({
-        type: "POST",  //type of method
-        url: "write_data.php",  //your page
-        data: data,// passing the values
-        success: function(res){  
-                               
-        }
-    });
-}
-
-function clickedTile(tile) {
-    if (user == users_turn) { /* Only if it's the current user's turn */
-        hand = document.getElementById('hand');
-        
-        if (tile.classList.contains('letter')) {
-            if (tile.parentNode.id == 'hand') {
-                if (picked_up != []) {
-                    /* SWAP TILE WITH PICKED UP TILE, tile=tile in hand to swap picked up tile with */
-                 
-                } else {
-                    /* PICK UP TILE FROM HAND, tile=tile in hand to pick up */
-                    picked_up = [tile.id, tile.innerHTML];
-                    tile.classList.add('recallable');
-                    return;
-                }
-            } else { /* Not in hand */
-                if (tile.classList.contains('recallable')) {
-                    /* RECALL TILE TO HAND, tile=tile on board to recall */
-                    letter = tile.innerHTML;
-                    removeLetterFromTile(tile);
-                    hand_slot_index = document.getElementById('hand').children.length; /* Index of the end of the hand */
-                    hand_tile = createTile(letter, hand_slot_index + 225); /* Create a tile at the end of the hand with letter */
-                    hand.appendChild(hand_tile); /* Add the tile to the hand */
-                    saveData({ user: user, tile: [tile.id, ""], hand: [hand_slot_index, letter] }); /* Write the changed data */
-                } else {
-                    /* NOT A RECALLABLE TILE */
-                    return;
-                }
-            }
-        } else {
-            if (picked_up != []) {
-                /* PUT DOWN PICKED UP TILE, tile=slot to put tile down on */
-                hand_tile = document.getElementById(picked_up[0])
-                real_old_index = parseInt(hand_tile.id);
-                hand_old_index = real_old_index - 225; /* Index of removed tile in hand (starting at 0) */
-                hand.removeChild(hand_tile);
-                addLetterToTile(tile, picked_up[1]);
-                tile.classList.add('recallable');
-                picked_up = [];
-            
-                tile_index = parseInt(tile.id);
-                saveData({ user: user, tile: [tile_index, tile.innerHTML], hand: [parseInt(hand_old_index), ""] })
-            
-                return;
-            } else {
-                /* TILE IS EMPTY SLOT AND NOTHING PICKED UP TO PLACE */
-                return;
-            }
-        }
-    }
-}
-
+     
 function createTile(letter, id) {
     tile = document.createElement("div"); /* Create a tile div */
     tile.classList.add("tile"); /* Sizing etc */
@@ -291,72 +120,61 @@ function createTile(letter, id) {
         tile.innerHTML = letter; /* Set the letter */
         addLetterToTile(tile, letter);
     }
-    tile.addEventListener("click", function(){ clickedTile(this) });
+    /*tile.addEventListener("click", function(){ clickedTile(this) });*/
     return tile;
 }
-
-function initialiseHand(hand) {
-	user_hand_letters.forEach(function (letter, index) {
-        if (letter != "") {
-            tile = createTile(letter, index + 225); /* Add to index to not overwrite board tiles */
-            hand.appendChild(tile); /* Add the tile to the hand */
-        }
-	})
-}
-
-function renderHand() {
-	hand = document.getElementById("hand");
-    if (hand.innerHTML == "") {
-        initialiseHand(hand);
-    } else {
-        user_hand_letters.forEach(function (letter, index) {
-            if (letter != "") {
-                slot = document.getElementById(index + 225);
-                slot.innerHTML = letter;
-            }
-        })
-    }
-}
-
-function initialiseBoard() {
-    board_letters.forEach(function (letter, index) {
+     
+function renderBoard(letters) {
+    board = document.getElementById('board');
+    board.innerHTML = "";
+    letters.forEach(function (letter, index) {
         tile = createTile(letter, index);
-        multiplier_class = multiplier_classes[multipliers[index]];
-        tile.classList.add(multiplier_class); /* Background colour */
-        board.appendChild(tile); /* Add the tile to the board */
+        if ([3,11,36,38,45,52,59,92,96,98,102,108,116,122,126,128,132,165,180,187,194,201,203,228,236].includes(index)){
+            tile.classList.add('double-letter');
+        } else if ([].includes(index)) {
+            tile.classList.add('triple-letter');
+        }
+        board.appendChild(tile);
     })
 }
+     
+function reloadPage(current_user) {
+    $.ajax({
+        type: "POST",
+        data: { 'current_user': current_user },
+                success: function() {
+                    location.reload();
+                }
+    });
+}
     
-function renderBoard() {
-    board = document.getElementById("board");
-    try {
-        board.removeChild(document.getElementById("loading")); /* If loading element is still in board */
-        initialiseBoard(); /* Board needs to be initialised (including removing loading element */
-    } catch { /* Board already initialised (loading removed and first render done) */
-        board_letters.forEach(function (letter, index) {
-            tile = document.getElementById(index);
-            tile.innerHTML = letter;
-        })
-    }
+function poll() {
+    $.ajax({
+            url: "retrieve_data.php",
+            success: function(data) {
+                board_letters = data[0]; /* Array of letters on the board */
+                renderBoard(board_letters);
+                new_users_turn = data[1];
+                if (new_users_turn != users_turn) { /* If the user whose turn it is has changed */
+                    reloadPage(current_user);
+                }
+            },
+            dataType: "json",
+            complete: poll,
+            timeout: 30000 });
 }
 
-(function poll(){
-	$.ajax({
-            url: "retrieve_data.php",
-                success: function(data){
-                    board_letters = data[0];
-                    user_hand_letters = data[user_hand_index + 1]; /* 0 is the board array so add 1 */
-                    renderBoard();
-                    renderHand();
-                },
-                dataType: "json",
-                complete: poll,
-                timeout: 30000 });
-})();
-    
-function pickRandom(array) {
-	return array[Math.floor(Math.random() * array.length)];
+tilebag = "<?php echo $tilebag ?>";
+current_user = "<?php echo $current_user ?>"; /* String of client's colour */
+users_turn = "<?php echo $users_turn ?>"; /* String of current player's colour */
+
+if (current_user != users_turn) { /* If it's not the current user's turn */
+    allow_moves = false;
+    poll(); /* Start long polling to show the current player's live tile moves */
+} else {
+    allow_moves = true;
 }
-    
-  </script>
+
+</script>
+    </body>
 </html>

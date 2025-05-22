@@ -4,8 +4,8 @@ include 'php_library.php';
 sleep(1); /* Server delay to prevent rapid polls bogging it down */
 
 $board = readArrayFile('board.txt');
-$users_turn = readArrayFile('users_turn.txt');
+$tilebag = readArrayFile('tilebag.txt');
 
 header('Content-Type: application/json');
-echo json_encode([$board, $users_turn]);
+echo json_encode([$board, $tilebag]);
 ?>

@@ -2,7 +2,7 @@
     <body>
     <form action="index.php" method="post">
      Select Player:<br>
-     <select name="user">
+     <select name="current_user">
      <option name="red">Red</option>
      <option name="blue">Blue</option>
      <option name="green">Green</option>
