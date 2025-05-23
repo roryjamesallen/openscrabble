@@ -236,32 +236,31 @@ function clickedTile(tile) {
         if (tile.classList.contains('letter')) {
             tile_letter = tile.innerHTML;
             if (tile.parentNode.id == 'hand') {
-                if (picked_up != []) {
+                if (picked_up != "") {
                     /* SWAP TILE WITH PICKED UP TILE, tile=tile in hand to swap picked up tile with */
                  
                 } else {
                     /* PICK UP TILE FROM HAND, tile=tile in hand to pick up */
                     picked_up = tile_id;
-                    recallable.push(tile_id);
                 }
             } else { /* Not in hand */
-                if (recallable.includes(tile_letter)) {
+                if (recallable.includes(tile_id)) {
                     /* RECALL TILE TO HAND, tile=tile on board to recall */
                     board_letters[tile_id] = ""; /* Remove letter from board */
                     hand_letters.push(tile_letter); /* Add letter to hand */
-                    removeFirstInstance(recallable, tile_letter); /* Make the letter non recallable */
+                    removeFirstInstance(recallable, tile_id); /* Make the letter non recallable */
                     writeGameData({tile: [tile_id, ""], hand: hand_letters, recallable: recallable, user: current_user});
                 } else {
                     /* NOT A RECALLABLE TILE */
                 }
             }
         } else {
-            if (picked_up != []) {
+            if (picked_up != "") {
                 /* PUT DOWN PICKED UP TILE, tile=slot to put tile down on */
                 hand_tile_letter = document.getElementById(picked_up).innerHTML;
                 removeFirstInstance(hand_letters, hand_tile_letter);
                 board_letters[tile_id] = hand_tile_letter;
-                recallable.push(hand_tile_letter);
+                recallable.push(tile_id);
                 picked_up = "";
                 writeGameData({tile: [tile_id, hand_tile_letter], hand: hand_letters, recallable: recallable, user: current_user})
             } else {
