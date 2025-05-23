@@ -1,15 +1,18 @@
 <?php
+
+$game_folder = "blahdeeblah/";
+
 $current_user = $_POST['current_user'];
 if ($current_user == "") {
     header('Location: choose_user.php');
 }
 include 'php_library.php';
 
-$board_letters = readArrayFile('board.txt');
-$tilebag = readArrayFile('tilebag.txt');
-$users_turn = readArrayFile('users_turn.txt')[0];
-$hand_letters = readArrayFile($current_user.'_hand.txt');
-$recallable = readArrayFile('recallable.txt');
+$board_letters = readArrayFile($game_folder.'board.txt');
+$tilebag = readArrayFile($game_folder.'tilebag.txt');
+$users_turn = readArrayFile($game_folder.'users_turn.txt')[0];
+$hand_letters = readArrayFile($game_folder.$current_user.'_hand.txt');
+$recallable = readArrayFile($game_folder.'recallable.txt');
 if ($recallable == "") {
     $recallable = [];
 }
@@ -229,6 +232,7 @@ function makeTurn() {
 
 /* ---- MAIN CODE ---- */
 
+game_folder = "<?php echo $game_folder ?>";
 tilebag = <?php echo json_encode($tilebag) ?>;
 current_user = "<?php echo $current_user ?>"; /* String of client's colour */
 users_turn = "<?php echo $users_turn ?>"; /* String of current player's colour */
