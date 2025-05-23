@@ -12,6 +12,7 @@
                 <option name="green">green</option>
                 <option name="yellow">yellow</option>
                 <input type="submit" value="Enter"/>
+                <input name="game_id" value="blahdeeblah"/>
             </select>
         </form>
      </div>

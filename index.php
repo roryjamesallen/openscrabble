@@ -1,6 +1,11 @@
 <?php
 
-$game_folder = "blahdeeblah/";
+$game_id = $_POST['game_id'];
+if ($game_id == "") {
+    header('Location: choose_user.php');
+} else {
+    $game_folder = $game_id."/";
+}
 
 $current_user = $_POST['current_user'];
 if ($current_user == "") {
@@ -106,7 +111,7 @@ function renderAll() {
 function reloadPage(current_user) {
     $.ajax({
         type: "POST",
-        data: { 'current_user': current_user },
+                data: { 'current_user': current_user, 'game_id': game_id },
                 success: function() {
                     location.reload();
                 }
@@ -127,6 +132,8 @@ function writeGameData(data) {
 function poll() {
     $.ajax({
             url: "retrieve_data.php",
+            type: "POST",
+            data: { game_id: game_id },
             success: function(data) {
                 board_letters = data[0]; /* Array of letters on the board */
                 recallable = data[2];
@@ -178,7 +185,7 @@ function clickedTile(tile) {
                     board_letters[tile_id] = ""; /* Remove letter from board */
                     hand_letters.push(tile_letter); /* Add letter to hand */
                     recallable = removeFirstInstance(recallable, tile_id); /* Make the letter non recallable */
-                    writeGameData({tile: [tile_id, ""], hand: hand_letters, recallable: recallable, user: current_user});
+                    writeGameData({game_id: game_id, tile: [tile_id, ""], hand: hand_letters, recallable: recallable, user: current_user});
                 } else {
                     /* NOT A RECALLABLE TILE */
                 }
@@ -192,7 +199,7 @@ function clickedTile(tile) {
                 board_letters[tile_id] = hand_tile_letter; /* Add the letter to the board */
                 recallable.push(tile_id); /* Mark the letter as recallable */
                 picked_up = "";
-                writeGameData({tile: [tile_id, hand_tile_letter], hand: hand_letters, recallable: recallable, user: current_user});
+                writeGameData({game_id: game_id, tile: [tile_id, hand_tile_letter], hand: hand_letters, recallable: recallable, user: current_user});
             } else {
                 /* TILE IS EMPTY SLOT AND NOTHING PICKED UP TO PLACE */
             }
@@ -208,7 +215,7 @@ function makeTurn() {
             /* GAME OVER */
             for (let i = 0; i < 225; i++) {
                 recallable.push(i);
-                writeGameData({recallable: recallable}); /* Make the whole board the last player's colour */
+                writeGameData({game_id: game_id, recallable: recallable}); /* Make the whole board the last player's colour */
             }
         } else {
             all_users = ["red","blue","green","yellow"];
@@ -224,7 +231,7 @@ function makeTurn() {
                 hand_letters.push(replacement_tile); /* Add it to the user's hand */
             }
       
-            writeGameData({user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag, recallable: recallable});
+            writeGameData({game_id: game_id, user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag, recallable: recallable});
             reloadPage(current_user);
         }
     }
@@ -232,6 +239,7 @@ function makeTurn() {
 
 /* ---- MAIN CODE ---- */
 
+game_id = "<?php echo $game_id ?>";
 game_folder = "<?php echo $game_folder ?>";
 tilebag = <?php echo json_encode($tilebag) ?>;
 current_user = "<?php echo $current_user ?>"; /* String of client's colour */

@@ -24,6 +24,8 @@ function createGame() {
     }
     saveArrayFile($game_id."/tilebag.txt", $initial_tilebag);
     saveArrayFile($game_id."/recallable.txt", []);
+    $user_starting = "red"; /* Make random or posted based on who's creating game */
+    saveArrayFile($game_id."/users_turn.txt", [$user_starting]);
 }
 
 createGame();
