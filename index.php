@@ -72,7 +72,7 @@ function renderBoard(letters) {
             tile.classList.add('triple-word');
         }
         
-        if (recallable.includes(index)) {
+        if (recallable.includes(index.toString())) {
             tile.classList.add('recallable');
             tile.classList.add(users_turn); /* Outline placed but not confirmed letters in the player's colour for all users to see */
         }
@@ -126,6 +126,7 @@ function poll() {
             url: "retrieve_data.php",
             success: function(data) {
                 board_letters = data[0]; /* Array of letters on the board */
+                recallable = data[2];
                 renderAll();
                 new_users_turn = data[1];
                 if (new_users_turn != users_turn) { /* If the user whose turn it is has changed */
@@ -211,7 +212,8 @@ function makeTurn() {
             tilebag = removeFirstInstance(tilebag, replacement_tile); /* Remove it from the tilebag */
             hand_letters.push(replacement_tile); /* Add it to the user's hand */
         }
-        writeGameData({user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag});
+        recallable = [];
+        writeGameData({user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag, recallable: recallable});
         reloadPage(current_user);
     }
 }
