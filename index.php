@@ -25,129 +25,17 @@ $users_turn_text = $users_turn_text." turn.";
 
 <html>
     <head>
+        <link rel="stylesheet" type="text/css" href="styles.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     </head>
     <body>
-    <style>
-:root {
-    --grey: #555555;
-    --beige: #f1e7d4;
-    --double-letter: #aabcbe;
-    --triple-letter: #606e7b;
-    --double-word: #e8a692;
-    --triple-word: #a43236;
-    --letter-tile: #f9f4ed;
- }
-      
-body {
-    font-family: Helvetica;
-    background-color: var(--letter-tile);
-}
-.main-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 25px;
-    margin: auto;
-    width: 750px;
-}
-.board {
-    display: flex;
-    flex-wrap: wrap;
-    width: 750px;
-}
-.hand {
-    display: flex;
-    justify-content: space-evenly;
-    width: 600px;
-    border: 5px solid #005500;
-    box-sizing: border-box;
-    background-color: green;
-    border-top-color: green;
-}
-.make-turn-button {
-    flex-grow: 1;
-    min-height: 59.33px;
-    line-height: 59.33px !important;
-}
-.tile {
-    width: 50px;
-    height: 50px;
-    line-height: 50px;
-    text-align: center;
-    font-size: 35px;
-    background-color: var(--beige);
-    border: 2px solid white;
-    border-radius: 5px;
-    box-sizing: border-box;
-    position: relative;
-}
-.tile::after {
-    display: block;
-    position: absolute;
-    bottom: -15px;;
-    right: 2px;
-    font-size: 15px;
-}
-
-.letter {
-    background-color: var(--letter-tile) !important;
-    border-color: var(--grey);
-}
-.red {
-    border-color: red;
-}
-.green {
-    border-color: green;
-}
-.blue {
-    border-color: blue;
-}
-.yellow {
-    border-color: yellow;
-}
-.e::after, .a::after, .i::after, .o::after, .n::after, .r::after, .t::after, .l::after, .s::after, .u::after {
-    content: "1";
-}
-.d::after, .g::after {
-    content: "2";
-}
-.b::after, .c::after, .m::after, .p::after {
-    content: "3";
-}
-.f::after, .h::after, .v::after, .w::after, .y::after {
-    content: "4";
-}
-.k::after {
-    content: "5";
-}
-.j::after, .x::after {
-    content: "8";
-}
-.q::after, .z::after {
-    content: "10";
-}
-
-.double-letter {
-    background-color: var(--double-letter);
-}
-.triple-letter {
-    background-color: var(--triple-letter);
-}
-.double-word {
-    background-color: var(--double-word);
-}
-.triple-word {
-    background-color: var(--triple-word);
-}
-    </style>
-         
          <div class="main-container">
              <h1 id="heading" style="margin: 0; margin-top: 25px;"><?php echo $users_turn_text ?></h1>
              <div id="board" class="board"></div>
              <div id="hand" class="hand"></div>
              <div id="make-turn-button" class="make-turn-button tile letter" onclick="makeTurn()">Go</div>
-         </div>
-          
+             <h1 id="heading" style="margin: 0; margin-bottom: 25px;"><?php echo count($tilebag)." tiles left"?></h1>
+         </div>      
 <script>
 function addLetterToTile(tile, letter) {
     tile.innerHTML = letter;
@@ -272,7 +160,10 @@ function clickedTile(tile) {
             if (tile.parentNode.id == 'hand') {
                 if (picked_up != "") {
                     /* SWAP TILE WITH PICKED UP TILE, tile=tile in hand to swap picked up tile with */
-                 
+                    picked_up_letter = hand_letters[picked_up - 225];
+                    hand_letters[picked_up - 225] = tile_letter;
+                    hand_letters[tile_id - 225] = picked_up_letter;
+                    picked_up = ""
                 } else {
                     /* PICK UP TILE FROM HAND, tile=tile in hand to pick up */
                     picked_up = tile_id;
@@ -337,6 +228,9 @@ picked_up = "";
 
 if (current_user != users_turn) { /* If it's not the current user's turn */
     allow_moves = false;
+    empty_board = ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","L","","O","","A","","D","","I","","N","","G","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""];
+    renderBoard(empty_board);
+    renderHand(["L","O","A","D","I","N","G"]);
     poll(); /* Start long polling to show the current player's live tile moves */
 } else {
     allow_moves = true;
