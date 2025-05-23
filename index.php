@@ -116,7 +116,7 @@ function writeGameData(data) {
         url: "write_data.php",  //your page
         data: data,// passing the values
         success: function(res){  
-                               
+            return true;
         }
     });
 }
@@ -200,21 +200,30 @@ function clickedTile(tile) {
 
 function makeTurn() {
     if (allow_moves == true) {
-        all_users = ["red","blue","green","yellow"];
-        users_turn_index = all_users.indexOf(current_user);
-        new_users_turn_index = users_turn_index + 1;
-        if (new_users_turn_index == all_users.length) {
-            new_users_turn_index = 0;
-        }
-        users_turn = all_users[new_users_turn_index];
-        while (tilebag.length != 0 && hand_letters.length < 7) { /* As long as there are tiles left in the tilebag and the user needs more tiles replacing */
-            replacement_tile = tilebag[Math.floor(Math.random()*tilebag.length)]; /* Pick a random new letter from the tilebag */
-            tilebag = removeFirstInstance(tilebag, replacement_tile); /* Remove it from the tilebag */
-            hand_letters.push(replacement_tile); /* Add it to the user's hand */
-        }
         recallable = [];
-        writeGameData({user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag, recallable: recallable});
-        reloadPage(current_user);
+        if (tilebag.length == 0 && hand_letters.length == 0) {
+            /* GAME OVER */
+            for (let i = 0; i < 225; i++) {
+                recallable.push(i);
+                writeGameData({recallable: recallable}); /* Make the whole board the last player's colour */
+            }
+        } else {
+            all_users = ["red","blue","green","yellow"];
+            users_turn_index = all_users.indexOf(current_user);
+            new_users_turn_index = users_turn_index + 1;
+            if (new_users_turn_index == all_users.length) {
+                new_users_turn_index = 0;
+            }
+            users_turn = all_users[new_users_turn_index];
+            while (tilebag.length != 0 && hand_letters.length < 7) { /* As long as there are tiles left in the tilebag and the user needs more tiles replacing */
+                replacement_tile = tilebag[Math.floor(Math.random()*tilebag.length)]; /* Pick a random new letter from the tilebag */
+                tilebag = removeFirstInstance(tilebag, replacement_tile); /* Remove it from the tilebag */
+                hand_letters.push(replacement_tile); /* Add it to the user's hand */
+            }
+      
+            writeGameData({user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag, recallable: recallable});
+            reloadPage(current_user);
+        }
     }
 }
 
@@ -230,9 +239,7 @@ picked_up = "";
 
 if (current_user != users_turn) { /* If it's not the current user's turn */
     allow_moves = false;
-    empty_board = ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","L","","O","","A","","D","","I","","N","","G","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""];
-    renderBoard(empty_board);
-    renderHand(["L","O","A","D","I","N","G"]);
+    renderAll();
     poll(); /* Start long polling to show the current player's live tile moves */
 } else {
     allow_moves = true;
