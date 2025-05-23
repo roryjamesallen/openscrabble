@@ -14,7 +14,13 @@ if ($recallable == "") {
     $recallable = [];
 }
 
-echo "<h1>You are ".$current_user.". It is ".$users_turn."'s turn</h1>";
+$users_turn_text = "You are <span style='color:".$current_user."'>".$current_user."</span>. It is ";
+if ($users_turn == $current_user) {
+    $users_turn_text = $users_turn_text."your";
+} else {
+    $users_turn_text = $users_turn_text.$users_turn."'s";
+}
+$users_turn_text = $users_turn_text." turn.";
 ?>
 
 <html>
@@ -35,11 +41,12 @@ echo "<h1>You are ".$current_user.". It is ".$users_turn."'s turn</h1>";
       
 body {
     font-family: Helvetica;
+    background-color: var(--letter-tile);
 }
 .main-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 50px;
+    gap: 25px;
     margin: auto;
     width: 750px;
 }
@@ -56,6 +63,11 @@ body {
     box-sizing: border-box;
     background-color: green;
     border-top-color: green;
+}
+.make-turn-button {
+    flex-grow: 1;
+    min-height: 59.33px;
+    line-height: 59.33px !important;
 }
 .tile {
     width: 50px;
@@ -128,10 +140,12 @@ body {
     background-color: var(--triple-word);
 }
     </style>
-         <h1 id="heading"></h1>
+         
          <div class="main-container">
+             <h1 id="heading" style="margin: 0; margin-top: 25px;"><?php echo $users_turn_text ?></h1>
              <div id="board" class="board"></div>
              <div id="hand" class="hand"></div>
+             <div id="make-turn-button" class="make-turn-button tile letter" onclick="makeTurn()">Go</div>
          </div>
           
 <script>
@@ -290,6 +304,25 @@ function clickedTile(tile) {
         }
     }
     renderAll();
+}
+
+function makeTurn() {
+    if (allow_moves == true) {
+        all_users = ["red","blue","green","yellow"];
+        users_turn_index = all_users.indexOf(current_user);
+        new_users_turn_index = users_turn_index + 1;
+        if (new_users_turn_index == all_users.length) {
+            new_users_turn_index = 0;
+        }
+        users_turn = all_users[new_users_turn_index];
+        while (tilebag.length != 0 && hand_letters.length < 7) { /* As long as there are tiles left in the tilebag and the user needs more tiles replacing */
+            replacement_tile = tilebag[Math.floor(Math.random()*tilebag.length)]; /* Pick a random new letter from the tilebag */
+            tilebag = removeFirstInstance(tilebag, replacement_tile); /* Remove it from the tilebag */
+            hand_letters.push(replacement_tile); /* Add it to the user's hand */
+        }
+        writeGameData({user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag});
+        reloadPage(current_user);
+    }
 }
 
 /* ---- MAIN CODE ---- */

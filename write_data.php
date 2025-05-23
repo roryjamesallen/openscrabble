@@ -21,6 +21,12 @@ if (!empty($_POST['tile'])) { /* If only one tile is being written start from cu
     
     $board[$tile_index] = $tile_value;
     saveArrayFile('board.txt', $board);
+
+    if (!empty($_POST['recallable'])) { /* If updating the hand */
+        saveArrayFile('recallable.txt', $_POST['recallable']);
+    } else {
+        saveArrayFile('recallable.txt', []);
+    }
 }
 
 if (!empty($_POST['hand'])) { /* If updating the hand */
@@ -30,10 +36,14 @@ if (!empty($_POST['hand'])) { /* If updating the hand */
     saveArrayFile($user_file, $hand);
 }
 
-if (!empty($_POST['recallable'])) { /* If updating the hand */
-    saveArrayFile('recallable.txt', $_POST['recallable']);
-} else {
-    saveArrayFile('recallable.txt', []);
+if (!empty($_POST['tilebag'])) { /* If updating the hand */
+    $tilebag = $_POST['tilebag'];
+    saveArrayFile('tilebag.txt', $tilebag);
+}
+
+if (!empty($_POST['users_turn'])) { /* If updating who's turn it is */
+    $new_users_turn = $_POST['users_turn'];
+    saveArrayFile('users_turn.txt', [$new_users_turn]);
 }
 
 ?>
