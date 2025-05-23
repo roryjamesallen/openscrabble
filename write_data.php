@@ -32,6 +32,8 @@ if (!empty($_POST['hand'])) { /* If updating the hand */
 
 if (!empty($_POST['recallable'])) { /* If updating the hand */
     saveArrayFile('recallable.txt', $_POST['recallable']);
+} else {
+    saveArrayFile('recallable.txt', []);
 }
 
 ?>

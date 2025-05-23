@@ -169,6 +169,7 @@ function renderBoard(letters) {
         } else if ([0,7,14,105,119,210,217,224].includes(index)) {
             tile.classList.add('triple-word');
         }
+        
         if (recallable.includes(index)) {
             tile.classList.add('recallable');
             tile.classList.add(users_turn); /* Outline placed but not confirmed letters in the player's colour for all users to see */
@@ -282,7 +283,7 @@ function clickedTile(tile) {
                 board_letters[tile_id] = hand_tile_letter; /* Add the letter to the board */
                 recallable.push(tile_id); /* Mark the letter as recallable */
                 picked_up = "";
-                writeGameData({tile: [tile_id, hand_tile_letter], hand: hand_letters, recallable: recallable, user: current_user})
+                writeGameData({tile: [tile_id, hand_tile_letter], hand: hand_letters, recallable: recallable, user: current_user});
             } else {
                 /* TILE IS EMPTY SLOT AND NOTHING PICKED UP TO PLACE */
             }
