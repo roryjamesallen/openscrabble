@@ -95,7 +95,7 @@ function renderBoard(letters) {
             tile.classList.add('double-letter');
         } else if ([20,24,76,80,84,88,136,140,144,148,200,204].includes(index)) {
             tile.classList.add('triple-letter');
-        } else if ([16,28,32,42,48,56,64,112,154,160,168,176,182,192,196,208].includes(index)) {
+        } else if ([16,28,32,42,48,56,64,70,112,154,160,168,176,182,192,196,208].includes(index)) {
             tile.classList.add('double-word');
         } else if ([0,7,14,105,119,210,217,224].includes(index)) {
             tile.classList.add('triple-word');
