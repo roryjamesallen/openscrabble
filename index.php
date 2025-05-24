@@ -1,17 +1,20 @@
 <?php
+include 'php_library.php';
 
 $game_id = $_POST['game_id'];
-if ($game_id == "") {
-    header('Location: choose_user.php');
-} else {
-    $game_folder = $game_id."/";
+$game_folder = "games/".$game_id."/";
+if (!is_dir($game_folder)) { /* If game folder doesn't exist */
+	if ($_POST['create_game'] == "on") { /* If the user's creating a game */
+		createGame($game_id); /* Create game files ten continue */
+	} else {
+		header('Location: choose_user.php'); /* If it doesn't exist and not creating new then redirect back */
+	}
 }
 
 $current_user = $_POST['current_user'];
 if ($current_user == "") {
     header('Location: choose_user.php');
 }
-include 'php_library.php';
 
 $board_letters = readArrayFile($game_folder.'board.txt');
 $tilebag = readArrayFile($game_folder.'tilebag.txt');
@@ -37,13 +40,21 @@ $users_turn_text = $users_turn_text." turn.";
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     </head>
     <body>
-         <div class="main-container">
-             <h1 id="heading" style="margin: 0; margin-top: 25px;"><?php echo $users_turn_text ?></h1>
+		<div class="main-container">
+         <div class="board-container">
+             <h1 id="heading" style="margin: 0;"><?php echo $users_turn_text ?></h1>
              <div id="board" class="board"></div>
              <div id="hand" class="hand"></div>
              <div id="make-turn-button" class="make-turn-button tile letter" onclick="makeTurn()">Go</div>
              <h1 id="heading" style="margin: 0; margin-bottom: 25px;"><?php echo count($tilebag)." tiles left"?></h1>
-         </div>      
+         </div> 
+		 <div class="scorecard-container">
+			<textarea id="scorecard-red" class="scorecard"></textarea>
+			<textarea id="scorecard-green" class="scorecard"></textarea>
+			<textarea id="scorecard-blue" class="scorecard"></textarea>
+			<textarea id="scorecard-yellow" class="scorecard"></textarea>
+		 </div>
+			</div>
 <script>
 function addLetterToTile(tile, letter) {
     tile.innerHTML = letter;

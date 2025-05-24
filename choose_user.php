@@ -13,6 +13,8 @@
                 <option name="yellow">yellow</option>
                 <input type="submit" value="Enter"/>
                 <input name="game_id" value="blahdeeblah"/>
+				<h1>Create New Game?</h1>
+				<input type="checkbox" name="create_game"/>
             </select>
         </form>
      </div>

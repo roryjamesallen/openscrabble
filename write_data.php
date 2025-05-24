@@ -9,7 +9,7 @@ function readArrayFile($filename) {
 }
 
 $game_id = $_POST['game_id'];
-$game_folder = $game_id."/";
+$game_folder = "games/".$game_id."/";
 
 if (!empty($_POST['board'])) { /* If a full board rewrite is sent */
     $board = $_POST['board'];

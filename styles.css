@@ -18,12 +18,27 @@ select, input {
     height: 50px;
 }
 .main-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 50px;
+	margin: 50px;
+}
+.board-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 25px;
-    margin: auto;
     width: 750px;
+}
+.scorecard-container {
+	display: flex;
+	flex-grow: 1;
+}
+.scorecard {
+	font-size: 24px;	
+	flex-basis: 0;
+	flex-grow: 1;
+	height: unset;
 }
 .board {
     display: flex;

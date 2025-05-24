@@ -2,7 +2,7 @@
 include 'php_library.php';
 
 $game_id = $_POST['game_id'];
-$game_folder = $game_id."/";
+$game_folder = "games/".$game_id."/";
 
 sleep(1); /* Server delay to prevent rapid polls bogging it down */
 
