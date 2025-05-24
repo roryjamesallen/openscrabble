@@ -32,6 +32,7 @@ function createGame($game_id) {
     saveArrayFile($game_folder."/recallable.txt", []);
     $user_starting = "red"; /* Make random or posted based on who's creating game */
     saveArrayFile($game_folder."/users_turn.txt", [$user_starting]);
+	saveArrayFile($game_folder."/scorecards.txt", ["RED\n--------\n","GREEN\n--------\n","BLUE\n--------\n","YELLOW\n--------\n"]);
 }
 
 ?>

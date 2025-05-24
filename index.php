@@ -24,9 +24,16 @@ $recallable = readArrayFile($game_folder.'recallable.txt');
 if ($recallable == "") {
     $recallable = [];
 }
+$scorecard_texts = readArrayFile($game_folder.'scorecards.txt');
+$scorecard_red = $scorecard_texts[0];
+$scorecard_green = $scorecard_texts[1];
+$scorecard_blue = $scorecard_texts[2];
+$scorecard_yellow = $scorecard_texts[3];
 
 $users_turn_text = "You are <span style='color:".$current_user."'>".$current_user."</span>. It is ";
+$scorecard_readonly = "readonly";
 if ($users_turn == $current_user) {
+	$scorecard_readonly = "";
     $users_turn_text = $users_turn_text."your";
 } else {
     $users_turn_text = $users_turn_text.$users_turn."'s";
@@ -40,6 +47,9 @@ $users_turn_text = $users_turn_text." turn.";
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     </head>
     <body>
+		<div class="navbar">
+			<h1 style="margin: 0">Game: <?php echo $game_id ?></h1>
+		</div>
 		<div class="main-container">
          <div class="board-container">
              <h1 id="heading" style="margin: 0;"><?php echo $users_turn_text ?></h1>
@@ -49,10 +59,10 @@ $users_turn_text = $users_turn_text." turn.";
              <h1 id="heading" style="margin: 0; margin-bottom: 25px;"><?php echo count($tilebag)." tiles left"?></h1>
          </div> 
 		 <div class="scorecard-container">
-			<textarea id="scorecard-red" class="scorecard"></textarea>
-			<textarea id="scorecard-green" class="scorecard"></textarea>
-			<textarea id="scorecard-blue" class="scorecard"></textarea>
-			<textarea id="scorecard-yellow" class="scorecard"></textarea>
+			<textarea id="scorecard-red" class="scorecard" <?php echo $scorecard_readonly ?>><?php echo $scorecard_red ?></textarea>
+			<textarea id="scorecard-green" class="scorecard" <?php echo $scorecard_readonly ?>><?php echo $scorecard_green ?></textarea>
+			<textarea id="scorecard-blue" class="scorecard" <?php echo $scorecard_readonly ?>><?php echo $scorecard_blue ?></textarea>
+			<textarea id="scorecard-yellow" class="scorecard" <?php echo $scorecard_readonly ?>><?php echo $scorecard_yellow ?></textarea>
 		 </div>
 			</div>
 <script>
@@ -229,7 +239,7 @@ function makeTurn() {
                 writeGameData({game_id: game_id, recallable: recallable}); /* Make the whole board the last player's colour */
             }
         } else {
-            all_users = ["red","blue","green","yellow"];
+            all_users = ["red","green","blue","yellow"];
             users_turn_index = all_users.indexOf(current_user);
             new_users_turn_index = users_turn_index + 1;
             if (new_users_turn_index == all_users.length) {
@@ -241,8 +251,13 @@ function makeTurn() {
                 tilebag = removeFirstInstance(tilebag, replacement_tile); /* Remove it from the tilebag */
                 hand_letters.push(replacement_tile); /* Add it to the user's hand */
             }
-      
-            writeGameData({game_id: game_id, user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag, recallable: recallable});
+			scorecards = [
+				document.getElementById('scorecard-red').value,
+				document.getElementById('scorecard-green').value,
+				document.getElementById('scorecard-blue').value,
+				document.getElementById('scorecard-yellow').value
+			];
+            writeGameData({game_id: game_id, scorecards: scorecards, user: current_user, users_turn: users_turn, hand: hand_letters, tilebag: tilebag, recallable: recallable});
             reloadPage(current_user);
         }
     }

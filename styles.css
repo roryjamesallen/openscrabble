@@ -17,6 +17,9 @@ select, input {
     font-size: 32px;
     height: 50px;
 }
+.navbar {
+	margin: 50px;
+}
 .main-container {
 	display: flex;
 	flex-wrap: wrap;
@@ -32,13 +35,19 @@ select, input {
 }
 .scorecard-container {
 	display: flex;
+	flex-wrap: wrap;
 	flex-grow: 1;
+	gap: 25px;
+	min-height: 1000px;
 }
 .scorecard {
 	font-size: 24px;	
 	flex-basis: 0;
 	flex-grow: 1;
 	height: unset;
+	background-color: var(--beige);
+	border: none;
+	padding: 10px;
 }
 .board {
     display: flex;

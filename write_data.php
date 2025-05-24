@@ -49,4 +49,8 @@ if (!empty($_POST['recallable'])) { /* If updating the hand */
     saveArrayFile($game_folder.'recallable.txt', []);
 }
 
+if (!empty($_POST['scorecards'])) { /* If updating the hand */
+    saveArrayFile($game_folder.'scorecards.txt', $_POST['scorecards']);
+}
+
 ?>
